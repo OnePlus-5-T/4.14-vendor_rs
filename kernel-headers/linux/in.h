@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
  * INET		An implementation of the TCP/IP protocol suite for the LINUX
  *		operating system.  INET is implemented using the  BSD Socket
@@ -21,8 +22,6 @@
 #include <linux/types.h>
 #include <linux/libc-compat.h>
 #include <linux/socket.h>
-
-#define sockaddr_storage __kernel_sockaddr_storage
 
 #if __UAPI_DEF_IN_IPPROTO
 /* Standard well-defined IP protocols.  */
@@ -88,8 +87,6 @@ struct in_addr {
 };
 #endif
 
-typedef uint32_t in_addr_t;
-
 #define IP_TOS		1
 #define IP_TTL		2
 #define IP_HDRINCL	3
@@ -121,6 +118,7 @@ typedef uint32_t in_addr_t;
 #define IP_NODEFRAG     22
 #define IP_CHECKSUM	23
 #define IP_BIND_ADDRESS_NO_PORT	24
+#define IP_RECVFRAGSIZE	25
 
 /* IP_MTU_DISCOVER values */
 #define IP_PMTUDISC_DONT		0	/* Never send DF frames */
@@ -282,6 +280,9 @@ struct sockaddr_in {
 /* Address indicating an error return. */
 #define	INADDR_NONE		((unsigned long int) 0xffffffff)
 
+/* Dummy address for src of ICMP replies if no real address is set (RFC7600). */
+#define	INADDR_DUMMY		((unsigned long int) 0xc0000008)
+
 /* Network number for local host loopback. */
 #define	IN_LOOPBACKNET		127
 
@@ -299,5 +300,6 @@ struct sockaddr_in {
 /* <asm/byteorder.h> contains the htonl type stuff.. */
 #include <asm/byteorder.h> 
 
+typedef uint32_t in_addr_t;
 
 #endif /* _LINUX_IN_H */

@@ -4,9 +4,9 @@
 #include <linux/msm_audio.h>
 
 #define AUDIO_GET_VOICEMEMO_CONFIG  _IOW(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM+0), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+0), unsigned int)
 #define AUDIO_SET_VOICEMEMO_CONFIG  _IOR(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM+1), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+1), unsigned int)
 
 /* rec_type */
 enum rpc_voc_rec_dir_type {

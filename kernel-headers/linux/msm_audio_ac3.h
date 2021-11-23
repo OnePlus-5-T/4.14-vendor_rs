@@ -4,9 +4,9 @@
 #include <linux/msm_audio.h>
 
 #define AUDIO_SET_AC3_CONFIG  _IOW(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM+0), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+0), unsigned int)
 #define AUDIO_GET_AC3_CONFIG  _IOR(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM+1), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+1), unsigned int)
 
 #define AUDAC3_DEF_WORDSIZE 0
 #define AUDAC3_DEF_USER_DOWNMIX_FLAG 0x0

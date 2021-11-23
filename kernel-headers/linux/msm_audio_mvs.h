@@ -4,9 +4,9 @@
 #include <linux/msm_audio.h>
 
 #define AUDIO_GET_MVS_CONFIG _IOW(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM + 0), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM + 0), unsigned int)
 #define AUDIO_SET_MVS_CONFIG _IOR(AUDIO_IOCTL_MAGIC, \
-	(AUDIO_MAX_COMMON_IOCTL_NUM + 1), unsigned)
+	(AUDIO_MAX_COMMON_IOCTL_NUM + 1), unsigned int)
 
 /* MVS modes */
 #define MVS_MODE_IS733 0x1 /*QCELP 13K*/
@@ -47,14 +47,15 @@ enum msm_audio_amr_mode {
 	MVS_AMR_MODE_UNDEF
 };
 
-/*The MVS VOC rate type is used to identify the rate of QCELP 13K(IS733),
-EVRC(IS127), 4GV, or 4GV-WB frame.*/
+/* The MVS VOC rate type is used to identify the rate of QCELP 13K(IS733),
+ * EVRC(IS127), 4GV, or 4GV-WB frame.
+ */
 enum msm_audio_voc_rate {
 		MVS_VOC_0_RATE, /* Blank frame */
 		MVS_VOC_8_RATE, /* 1/8 rate    */
 		MVS_VOC_4_RATE, /* 1/4 rate    */
 		MVS_VOC_2_RATE, /* 1/2 rate    */
-		MVS_VOC_1_RATE,/* Full rate   */
+		MVS_VOC_1_RATE, /* Full rate   */
 		MVS_VOC_ERASURE, /* erasure frame */
 		MVS_VOC_RATE_MAX,
 		MVS_VOC_RATE_UNDEF = MVS_VOC_RATE_MAX

@@ -1,5 +1,6 @@
-/*The following structure has been taken
-from Monkey's Audio SDK with permission*/
+/* The following structure has been taken
+ * from Monkey's Audio SDK with permission
+ */
 
 #ifndef _MSM_AUDIO_APE_H
 #define _MSM_AUDIO_APE_H

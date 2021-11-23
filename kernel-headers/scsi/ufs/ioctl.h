@@ -9,6 +9,9 @@
  */
 #define UFS_IOCTL_QUERY			0x5388
 
+/* ARCH_SONY_YOSHINO || ARCH_SONY_TAMA */
+#define UFS_IOCTL_WRITE_BUFFER		0x53EF
+
 /**
  * struct ufs_ioctl_query_data - used to transfer data to and from user via ioctl
  * @opcode: type of data to query (descriptor/attribute/flag)
@@ -16,7 +19,7 @@
  * @buf_size: number of allocated bytes/data size on return
  * @buffer: data location
  *
- * Received: buffer and buf_size (available space for transfered data)
+ * Received: buffer and buf_size (available space for transferred data)
  * Submitted: opcode, idn, length, buf_size
  */
 struct ufs_ioctl_query_data {
@@ -51,6 +54,12 @@ struct ufs_ioctl_query_data {
 	 * For Read/Write Attribute you will have to allocate 4 bytes
 	 * For Read/Write Flag you will have to allocate 1 byte
 	 */
+	__u8 buffer[0];
+};
+
+/* ARCH_SONY_YOSHINO || ARCH_SONY_TAMA */
+struct ufs_ioctl_write_buffer_data {
+	__u32 buf_size;
 	__u8 buffer[0];
 };
 
