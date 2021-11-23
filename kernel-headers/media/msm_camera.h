@@ -1,4 +1,4 @@
-/* Copyright (c) 2009-2012, 2014-2016, 2018 The Linux Foundation.
+/* Copyright (c) 2009-2012, 2014-2016, 2018, The Linux Foundation.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,9 +14,12 @@
 #ifndef __UAPI_MSM_CAMERA_H
 #define __UAPI_MSM_CAMERA_H
 
+#define CAM_API_V1
+
 #include <linux/videodev2.h>
 #include <linux/types.h>
 #include <linux/ioctl.h>
+#include <linux/media.h>
 
 #include <linux/msm_ion.h>
 
@@ -33,7 +36,7 @@
 	_IOW(MSM_CAM_IOCTL_MAGIC, 2, struct msm_pmem_info *)
 
 #define MSM_CAM_IOCTL_UNREGISTER_PMEM \
-	_IOW(MSM_CAM_IOCTL_MAGIC, 3, unsigned)
+	_IOW(MSM_CAM_IOCTL_MAGIC, 3, unsigned int)
 
 #define MSM_CAM_IOCTL_CTRL_COMMAND \
 	_IOW(MSM_CAM_IOCTL_MAGIC, 4, struct msm_ctrl_cmd *)
@@ -90,7 +93,7 @@
 	_IOW(MSM_CAM_IOCTL_MAGIC, 21, struct sensor_cfg_data *)
 
 #define MSM_CAM_IOCTL_FLASH_LED_CFG \
-	_IOW(MSM_CAM_IOCTL_MAGIC, 22, unsigned *)
+	_IOW(MSM_CAM_IOCTL_MAGIC, 22, unsigned int *)
 
 #define MSM_CAM_IOCTL_UNBLOCK_POLL_FRAME \
 	_IO(MSM_CAM_IOCTL_MAGIC, 23)
@@ -438,7 +441,8 @@ struct msm_isp_event_ctrl {
 struct msm_stats_event_ctrl {
 	/* 0 - ctrl_cmd from control thread,
 	 * 1 - stats/event kernel,
-	 * 2 - V4L control or read request */
+	 * 2 - V4L control or read request
+	 */
 	int resptype;
 	int timeout_ms;
 	struct msm_ctrl_cmd ctrl_cmd;
@@ -449,7 +453,8 @@ struct msm_stats_event_ctrl {
 /* 2. config command: config command(from config thread); */
 struct msm_camera_cfg_cmd {
 	/* what to config:
-	 * 1 - sensor config, 2 - vfe config */
+	 * 1 - sensor config, 2 - vfe config
+	 */
 	uint16_t cfg_type;
 
 	/* sensor config type */
@@ -476,11 +481,11 @@ struct msm_camera_cfg_cmd {
 #define CMD_STATS_AF_ENABLE		13
 #define CMD_STATS_AEC_ENABLE		14
 #define CMD_STATS_AWB_ENABLE		15
-#define CMD_STATS_ENABLE  		16
+#define CMD_STATS_ENABLE		16
 
 #define CMD_STATS_AXI_CFG		17
 #define CMD_STATS_AEC_AXI_CFG		18
-#define CMD_STATS_AF_AXI_CFG 		19
+#define CMD_STATS_AF_AXI_CFG		19
 #define CMD_STATS_AWB_AXI_CFG		20
 #define CMD_STATS_RS_AXI_CFG		21
 #define CMD_STATS_CS_AXI_CFG		22
@@ -1169,7 +1174,7 @@ enum msm_v4l2_iso_mode {
 
 enum msm_v4l2_wb_mode {
 	MSM_V4L2_WB_OFF,
-	MSM_V4L2_WB_AUTO ,
+	MSM_V4L2_WB_AUTO,
 	MSM_V4L2_WB_CUSTOM,
 	MSM_V4L2_WB_INCANDESCENT,
 	MSM_V4L2_WB_FLUORESCENT,
@@ -1242,7 +1247,7 @@ struct sensor_3d_exp_cfg {
 	uint16_t gb_gain;
 	uint16_t gain_adjust;
 };
-struct sensor_3d_cali_data_t{
+struct sensor_3d_cali_data_t {
 	unsigned char left_p_matrix[3][4][8];
 	unsigned char right_p_matrix[3][4][8];
 	unsigned char square_len[8];
@@ -1378,6 +1383,7 @@ struct msm_camera_csid_params {
 	uint8_t lane_cnt;
 	uint16_t lane_assign;
 	uint8_t phy_sel;
+	uint32_t topology;
 	struct msm_camera_csid_lut_params lut_params;
 };
 
@@ -1422,6 +1428,8 @@ struct csic_cfg_data {
 enum csid_cfg_type_t {
 	CSID_INIT,
 	CSID_CFG,
+	CSID_SECCAM_TOPOLOGY,
+	CSID_SECCAM_RESET,
 };
 
 struct csid_cfg_data {
@@ -1684,7 +1692,7 @@ enum gpio_operation_type {
 
 struct msm_cam_gpio_operation {
 	enum gpio_operation_type op_type;
-	unsigned address;
+	unsigned int address;
 	int value;
 	const char *tag;
 };
@@ -1700,6 +1708,7 @@ enum actuator_type {
 	ACTUATOR_PIEZO,
 	ACTUATOR_HVCM,
 	ACTUATOR_BIVCM,
+	ACTUATOR_VCM2,
 };
 
 enum msm_actuator_data_type {
@@ -1739,7 +1748,7 @@ struct reg_settings_t {
 
 struct region_params_t {
 	/* [0] = ForwardDirection Macro boundary
-	   [1] = ReverseDirection Inf boundary
+	 *  [1] = ReverseDirection Inf boundary
 	 */
 	uint16_t step_bound[2];
 	uint16_t code_per_step;
@@ -1985,8 +1994,7 @@ struct img_plane_info {
 
 #define QCAMERA_NAME "qcamera"
 #define QCAMERA_SERVER_NAME "qcamera_server"
-#define QCAMERA_DEVICE_GROUP_ID 1
-#define QCAMERA_VNODE_GROUP_ID 2
+#define QCAMERA_VNODE_GROUP_ID MEDIA_ENT_F_IO_V4L
 
 enum msm_cam_subdev_type {
 	CSIPHY_DEV,

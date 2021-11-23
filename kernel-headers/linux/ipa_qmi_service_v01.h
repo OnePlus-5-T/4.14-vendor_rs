@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -39,6 +39,8 @@
 #ifndef IPA_QMI_SERVICE_V01_H
 #define IPA_QMI_SERVICE_V01_H
 
+#include <linux/types.h>
+
 #define QMI_IPA_IPFLTR_NUM_IHL_RANGE_16_EQNS_V01 2
 #define QMI_IPA_IPFLTR_NUM_MEQ_32_EQNS_V01 2
 #define QMI_IPA_IPFLTR_NUM_IHL_MEQ_32_EQNS_V01 2
@@ -48,11 +50,18 @@
 #define QMI_IPA_MAX_PIPES_V01 20
 #define QMI_IPA_MAX_APN_V01 8
 #define QMI_IPA_MAX_PER_CLIENTS_V01 64
+#define QMI_IPA_REMOTE_MHI_CHANNELS_NUM_MAX_V01 6
+#define QMI_IPA_REMOTE_MHI_MEMORY_MAPPING_NUM_MAX_V01 6
 /* Currently max we can use is only 1. But for scalability purpose
  * we are having max value as 8.
  */
 #define QMI_IPA_MAX_CLIENT_DST_PIPES_V01 8
 #define QMI_IPA_MAX_UL_FIREWALL_RULES_V01 64
+
+/*
+ * Indicates presence of newly added member to support HW stats.
+ */
+#define IPA_QMI_SUPPORTS_STATS
 
 #define IPA_INT_MAX	((int)(~0U>>1))
 #define IPA_INT_MIN	(-IPA_INT_MAX - 1)
@@ -83,8 +92,8 @@ enum ipa_qmi_error_type_v01 {
 };
 
 struct ipa_qmi_response_type_v01 {
-	enum ipa_qmi_result_type_v01 result;
-	enum ipa_qmi_error_type_v01 error;
+	uint16_t result;
+	uint16_t error;
 };
 
 enum ipa_platform_type_enum_v01 {
@@ -177,14 +186,14 @@ struct ipa_zip_tbl_info_type_v01 {
 
 /**
  * Request Message; Requests the modem IPA driver
- * to perform initializtion
+ * to perform initialization
  */
 struct ipa_init_modem_driver_req_msg_v01 {
 
 	/* Optional */
 	/*  Platform info */
-	uint8_t platform_type_valid;  /**< Must be set to true if platform_type
-	is being passed */
+	uint8_t platform_type_valid;
+	/* Must be set to true if platform_type is being passed */
 	enum ipa_platform_type_enum_v01 platform_type;
 	/*   Provides information about the platform (ex. TN/MN/LE/MSM,etc) */
 
@@ -204,15 +213,15 @@ struct ipa_init_modem_driver_req_msg_v01 {
 
 	/* Optional */
 	/*  IPV6 Routing table info */
-	uint8_t v6_route_tbl_info_valid;  /**< Must be set to true if
-	v6_route_tbl_info is being passed */
+	uint8_t v6_route_tbl_info_valid;
+	/* Must be set to true if v6_route_tbl_info is being passed */
 	struct ipa_route_tbl_info_type_v01 v6_route_tbl_info;
 	/*	Provides information about the IPV6 routing table */
 
 	/* Optional */
 	/*  IPV4 Filter table start address */
-	uint8_t v4_filter_tbl_start_addr_valid;  /**< Must be set to true
-	if v4_filter_tbl_start_addr is being passed */
+	uint8_t v4_filter_tbl_start_addr_valid;
+	/* Must be set to true if v4_filter_tbl_start_addr is being passed */
 	uint32_t v4_filter_tbl_start_addr;
 	/*	Provides information about the starting address of IPV4 filter
 	 *	table in IPAv2 or non-hashable IPv4 filter table in IPAv3.
@@ -241,8 +250,8 @@ struct ipa_init_modem_driver_req_msg_v01 {
 
 	/* Optional */
 	/*  Destination end point for control commands from modem */
-	uint8_t ctrl_comm_dest_end_pt_valid;  /**< Must be set to true if
-	ctrl_comm_dest_end_pt is being passed */
+	uint8_t ctrl_comm_dest_end_pt_valid;
+	/* Must be set to true if ctrl_comm_dest_end_pt is being passed */
 	uint32_t ctrl_comm_dest_end_pt;
 	/*  Provides information about the destination end point on the
 	 *	application processor to which the modem driver can send
@@ -252,8 +261,8 @@ struct ipa_init_modem_driver_req_msg_v01 {
 
 	/* Optional */
 	/*  Modem Bootup Information */
-	uint8_t is_ssr_bootup_valid;  /**< Must be set to true if
-	is_ssr_bootup is being passed */
+	uint8_t is_ssr_bootup_valid;
+	/* Must be set to true if is_ssr_bootup is being passed */
 	uint8_t is_ssr_bootup;
 	/*	Specifies whether the modem is booting up after a modem only
 	 *	sub-system restart or not. This will let the modem driver
@@ -268,7 +277,7 @@ struct ipa_init_modem_driver_req_msg_v01 {
 	/* Must be set to true if hdr_proc_ctx_tbl_info is being passed */
 	struct ipa_hdr_proc_ctx_tbl_info_type_v01 hdr_proc_ctx_tbl_info;
 	/* Provides information about the header processing context table.
-	*/
+	 */
 
 	/* Optional */
 	/*  Compression Decompression Table Information */
@@ -276,7 +285,7 @@ struct ipa_init_modem_driver_req_msg_v01 {
 	/* Must be set to true if zip_tbl_info is being passed */
 	struct ipa_zip_tbl_info_type_v01 zip_tbl_info;
 	/* Provides information about the zip table.
-	*/
+	 */
 
 	/* Optional */
 	/*  IPv4 Hashable Routing Table Information */
@@ -290,27 +299,62 @@ struct ipa_init_modem_driver_req_msg_v01 {
 	uint8_t v6_hash_route_tbl_info_valid;
 	struct ipa_route_tbl_info_type_v01 v6_hash_route_tbl_info;
 
-	/* Optional */
-	/*  IPv4 Hashable Filter Table Start Address */
-	/** Must be set to true if v4_hash_filter_tbl_start_addr
-	    is being passed */
+	/*
+	 * Optional
+	 * IPv4 Hashable Filter Table Start Address
+	 * Must be set to true if v4_hash_filter_tbl_start_addr
+	 * is being passed
+	 */
 	uint8_t v4_hash_filter_tbl_start_addr_valid;
 	uint32_t v4_hash_filter_tbl_start_addr;
-	/**	Identifies the starting address of the IPv4 hashable filter
-	    table in IPAv3 onwards. Denotes the offset from the start of
-		the IPA shared memory.
-	*/
+	/* Identifies the starting address of the IPv4 hashable filter
+	 * table in IPAv3 onwards. Denotes the offset from the start of
+	 * the IPA shared memory.
+	 */
 
-	/* Optional */
-	/*  IPv6 Hashable Filter Table Start Address */
-	/** Must be set to true if v6_hash_filter_tbl_start_addr
-	    is being passed */
+	/* Optional
+	 * IPv6 Hashable Filter Table Start Address
+	 * Must be set to true if v6_hash_filter_tbl_start_addr
+	 * is being passed
+	 */
 	uint8_t v6_hash_filter_tbl_start_addr_valid;
 	uint32_t v6_hash_filter_tbl_start_addr;
-	/**	Identifies the starting address of the IPv6 hashable filter
-	    table in IPAv3 onwards. Denotes the offset from the start of
-		the IPA shared memory.
-	*/
+	/* Identifies the starting address of the IPv6 hashable filter
+	 * table in IPAv3 onwards. Denotes the offset from the start of
+	 * the IPA shared memory.
+	 */
+
+	/* Optional
+	 * Modem HW Stats Quota Base address
+	 * Must be set to true if hw_stats_quota_base_addr
+	 * is being passed
+	 */
+	uint8_t hw_stats_quota_base_addr_valid;
+	uint32_t hw_stats_quota_base_addr;
+
+	/* Optional
+	 * Modem HW Stats Quota Size
+	 * Must be set to true if hw_stats_quota_size
+	 * is being passed
+	 */
+	uint8_t hw_stats_quota_size_valid;
+	uint32_t hw_stats_quota_size;
+
+	/* Optional
+	 * Modem HW Drop Stats Table Start Address
+	 * Must be set to true if hw_drop_stats_base_addr
+	 * is being passed
+	 */
+	uint8_t hw_drop_stats_base_addr_valid;
+	uint32_t hw_drop_stats_base_addr;
+
+	/* Optional
+	 * Modem HW Drop Stats Table size
+	 * Must be set to true if hw_drop_stats_table_size
+	 * is being passed
+	 */
+	uint8_t hw_drop_stats_table_size_valid;
+	uint32_t hw_drop_stats_table_size;
 };  /* Message */
 
 /* Response Message; Requests the modem IPA driver about initialization */
@@ -412,6 +456,16 @@ struct ipa_indication_reg_req_msg_v01 {
 	 *  QMI_IPA_INDICATION_REGISTER_REQ is being originated from the Master
 	 *  driver
 	 */
+
+	/* Optional */
+	/* IPA MHI Ready Indication */
+	uint8_t ipa_mhi_ready_ind_valid;
+	/*  Must be set to true if ipa_mhi_ready_ind is being passed */
+	uint8_t ipa_mhi_ready_ind;
+	/*
+	 * If set to TRUE, this field indicates that the client wants to
+	 * receive indications about MHI ready for Channel allocations.
+	 */
 };  /* Message */
 
 
@@ -502,7 +556,14 @@ struct ipa_filter_rule_type_v01 {
 	/* 16-bit Bitmask to indicate how many eqs are valid in this rule */
 
 	uint8_t tos_eq_present;
-	/* Specifies if a type of service check rule is present */
+	/*
+	 * tos_eq_present field has two meanings:
+	 * IPA ver < 4.5:
+	 *  specifies if a type of service check rule is present
+	 *  (as the field name reveals).
+	 * IPA ver >= 4.5:
+	 *  specifies if a tcp pure ack check rule is present
+	 */
 
 	uint8_t tos_eq;
 	/* The value to check against the type of service (ipv4) field */
@@ -543,7 +604,8 @@ struct ipa_filter_rule_type_v01 {
 
 	uint8_t tc_eq;
 	/* The value against which the IPV4 traffic class field has to
-		be checked */
+	 * be checked
+	 */
 
 	uint8_t flow_eq_present;
 	/* Specifies if the "flow equals" rule is present in this rule */
@@ -578,7 +640,7 @@ struct ipa_filter_rule_type_v01 {
 	struct ipa_ipfltr_mask_eq_32_type_v01
 		ihl_offset_meq_32[QMI_IPA_IPFLTR_NUM_IHL_MEQ_32_EQNS_V01];
 	/*	Array of 32 bit masked comparison equations.
-	*/
+	 */
 
 	uint8_t num_offset_meq_128;
 	/*	The number of 128 bit comparison equations in this rule */
@@ -726,13 +788,13 @@ struct ipa_filter_spec_ex_type_v01 {
 	 */
 
 	uint32_t rule_id;
-	/** Rule Id of the given filter. The Rule Id is populated in the rule
-		header when installing the rule in IPA.
-	*/
+	/* Rule Id of the given filter. The Rule Id is populated in the rule
+	 * header when installing the rule in IPA.
+	 */
 
 	uint8_t is_rule_hashable;
 	/** Specifies whether the given rule is hashable.
-	*/
+	 */
 };  /* Type */
 
 
@@ -741,9 +803,10 @@ struct ipa_filter_spec_ex_type_v01 {
  *	of filtering rules in the hardware block by the remote side.
  */
 struct ipa_install_fltr_rule_req_msg_v01 {
-	/* Optional */
-	/*  IP type that this rule applies to
-	Filter specification to be installed in the hardware */
+	/* Optional
+	 * IP type that this rule applies to
+	 * Filter specification to be installed in the hardware
+	 */
 	uint8_t filter_spec_list_valid;
 	/* Must be set to true if filter_spec_list is being passed */
 	uint32_t filter_spec_list_len;
@@ -1308,8 +1371,9 @@ struct ipa_config_req_msg_v01 {
 	uint8_t dl_buf_size_valid;
 	/* Must be set to true if dl_buf_size is being passed */
 	uint32_t dl_buf_size;
-	/*  Informs the remote driver about the single xDCI buffer size.
-		This is applicable only in GSI mode(in Bytes).\n */
+	/* Informs the remote driver about the single xDCI buffer size.
+	 * This is applicable only in GSI mode(in Bytes).\n
+	 */
 };  /* Message */
 
 /* Response Message; Notifies the remote driver of the configuration
@@ -1483,9 +1547,9 @@ struct ipa_get_apn_data_stats_resp_msg_v01 {
 	struct ipa_apn_data_stats_info_type_v01
 		apn_data_stats_list[QMI_IPA_MAX_APN_V01];
 	/* List of APN data retrieved as per request on mux_id.
-	* For now, only one APN monitoring is supported on modem driver.
-	* Making this as list for expandability to support more APNs in future.
-	*/
+	 * For now, only one APN monitoring is supported on modem driver.
+	 * Making this as list for expandability to support more APNs in future.
+	 */
 };  /* Message */
 
 struct ipa_data_usage_quota_info_type_v01 {
@@ -1545,7 +1609,7 @@ struct ipa_data_usage_quota_reached_ind_msg_v01 {
  */
 struct ipa_stop_data_usage_quota_req_msg_v01 {
 	/* This element is a placeholder to prevent the declaration of
-     *  an empty struct.  DO NOT USE THIS FIELD UNDER ANY CIRCUMSTANCE
+	 *  an empty struct.  DO NOT USE THIS FIELD UNDER ANY CIRCUMSTANCE
 	 */
 	char __placeholder;
 };  /* Message */
@@ -1570,34 +1634,32 @@ struct ipa_install_fltr_rule_req_ex_msg_v01 {
 	struct ipa_filter_spec_ex_type_v01
 		filter_spec_ex_list[QMI_IPA_MAX_FILTERS_EX_V01];
 	/* List of filter specifications of filters that must be installed in
-	the IPAv3.x hardware.
-	The driver installing these rules must do so in the same order as
-	specified in this list.
-	*/
+	 * the IPAv3.x hardware.
+	 * The driver installing these rules must do so in the same order as
+	 * specified in this list.
+	 */
 
 	/* Optional */
 	/* Pipe Index to Install Rule */
 	uint8_t source_pipe_index_valid;
 	uint32_t source_pipe_index;
 	/* Pipe index to install the filter rule.
-	The requester may not always know the pipe indices. If not specified,
-	the receiver must install this rule on all pipes that it controls,
-	through which data may be fed into the IPA.
-	*/
+	 * The requester may not always know the pipe indices. If not specified,
+	 * the receiver must install this rule on all pipes that it controls,
+	 * through which data may be fed into the IPA.
+	 */
 
 	/* Optional */
 	/* Total Number of IPv4 Filters in the Filter Spec List */
 	uint8_t num_ipv4_filters_valid;
 	uint32_t num_ipv4_filters;
-	/* Number of IPv4 rules included in the filter specification list.
-	*/
+	/* Number of IPv4 rules included in the filter specification list. */
 
 	/* Optional */
 	/* Total Number of IPv6 Filters in the Filter Spec List */
 	uint8_t num_ipv6_filters_valid;
 	uint32_t num_ipv6_filters;
-	/* Number of IPv6 rules included in the filter specification list.
-	*/
+	/* Number of IPv6 rules included in the filter specification list. */
 
 	/* Optional */
 	/* List of XLAT Filter Indices in the Filter Spec List */
@@ -1605,10 +1667,10 @@ struct ipa_install_fltr_rule_req_ex_msg_v01 {
 	uint32_t xlat_filter_indices_list_len;
 	uint32_t xlat_filter_indices_list[QMI_IPA_MAX_FILTERS_EX_V01];
 	/* List of XLAT filter indices.
-	Filter rules at specified indices must be modified by the
-	receiver if the PDN is XLAT before installing them on the associated
-	IPA consumer pipe.
-	*/
+	 * Filter rules at specified indices must be modified by the
+	 * receiver if the PDN is XLAT before installing them on the associated
+	 * IPA consumer pipe.
+	 */
 };  /* Message */
 
 /* Response Message; Requests installation of filtering rules in the hardware
@@ -1619,13 +1681,13 @@ struct ipa_install_fltr_rule_resp_ex_msg_v01 {
 	/* Result Code */
 	struct ipa_qmi_response_type_v01 resp;
 	/* Standard response type.
-	Standard response type. Contains the following data members:
-	- qmi_result_type -- QMI_RESULT_SUCCESS or QMI_RESULT_FAILURE
-	- qmi_error_type  -- Error code. Possible error code values are
-						 described in the error codes
-						 section of each message
-						 definition.
-	*/
+	 * Standard response type. Contains the following data members:
+	 * - qmi_result_type -- QMI_RESULT_SUCCESS or QMI_RESULT_FAILURE
+	 * - qmi_error_type  -- Error code. Possible error code values are
+	 *					 described in the error codes
+	 *					 section of each message
+	 *					 definition.
+	 */
 
 	/* Optional */
 	/* Rule ID List */
@@ -1633,9 +1695,9 @@ struct ipa_install_fltr_rule_resp_ex_msg_v01 {
 	uint32_t rule_id_len;
 	uint32_t rule_id[QMI_IPA_MAX_FILTERS_EX_V01];
 	/* List of rule IDs returned to the control point.
-	Any further reference to the rule is done using the filter rule ID
-	specified in this list.
-	*/
+	 * Any further reference to the rule is done using the filter rule ID
+	 * specified in this list.
+	 */
 };  /* Message */
 
 /*
@@ -1905,6 +1967,245 @@ struct ipa_configure_ul_firewall_rules_ind_msg_v01 {
 };  /* Message */
 
 
+struct ipa_mhi_ch_init_info_type_v01 {
+	uint8_t ch_id;
+	/* Remote MHI channel ID */
+
+	uint8_t er_id;
+	/* Remote MHI Event ring ID */
+
+	uint32_t ch_doorbell_addr;
+	/* TR Channel Doorbell addr */
+
+	uint32_t er_doorbell_addr;
+	/* Event ring Doorbell addr */
+
+	uint32_t direction_type;
+	/* Direction type */
+};
+
+struct ipa_mhi_smmu_info_type_v01 {
+	uint64_t iova_ctl_base_addr;
+	/* IOVA mapped Control Region base address */
+
+	uint64_t iova_ctl_size;
+	/* IOVA Control region size */
+
+	uint64_t iova_data_base_addr;
+	/* IOVA mapped Data Region base address */
+
+	uint64_t iova_data_size;
+	/* IOVA Data Region size */
+};
+
+struct ipa_mhi_ready_indication_msg_v01 {
+	/* Mandatory */
+	uint32_t ch_info_arr_len;
+	/* Must be set to # of elements in ch_info_arr. */
+	struct ipa_mhi_ch_init_info_type_v01
+		ch_info_arr[QMI_IPA_REMOTE_MHI_CHANNELS_NUM_MAX_V01];
+	/* Channel Information array */
+
+	/* Mandatory */
+	uint8_t smmu_info_valid;
+	/* Must be set to true if smmu_info is being passed. */
+	struct ipa_mhi_smmu_info_type_v01 smmu_info;
+	/* SMMU enabled indication */
+};
+#define IPA_MHI_READY_INDICATION_MSG_V01_MAX_MSG_LEN 123
+
+struct ipa_mhi_mem_addr_info_type_v01 {
+	uint64_t pa;
+	/* Memory region start physical addr */
+
+	uint64_t iova;
+	/* Memory region start iova mapped addr */
+
+	uint64_t size;
+	/* Memory region size */
+};
+
+enum ipa_mhi_brst_mode_enum_v01 {
+	IPA_MHI_BRST_MODE_ENUM_MIN_VAL_V01 = IPA_INT_MIN,
+
+	QMI_IPA_BURST_MODE_DEFAULT_V01 = 0,
+	/*
+	 * Default - burst mode enabled for hardware channels,
+	 * disabled for software channels
+	 */
+
+	QMI_IPA_BURST_MODE_ENABLED_V01 = 1,
+	/* Burst mode is enabled for this channel */
+
+	QMI_IPA_BURST_MODE_DISABLED_V01 = 2,
+	/* Burst mode is disabled for this channel */
+
+	IPA_MHI_BRST_MODE_ENUM_MAX_VAL_V01 = IPA_INT_MAX,
+};
+
+struct ipa_mhi_tr_info_type_v01 {
+	uint8_t ch_id;
+	/* TR Channel ID */
+
+	uint16_t poll_cfg;
+	/*
+	 * Poll Configuration - Default or timer to poll the
+	 * MHI context in milliseconds
+	 */
+
+	enum ipa_mhi_brst_mode_enum_v01 brst_mode_type;
+	/* Burst mode configuration */
+
+	uint64_t ring_iova;
+	/* IOVA mapped ring base address */
+
+	uint64_t ring_len;
+	/* Ring Length in bytes */
+
+	uint64_t rp;
+	/* IOVA mapped Read pointer address */
+
+	uint64_t wp;
+	/* IOVA mapped write pointer address */
+};
+
+struct ipa_mhi_er_info_type_v01 {
+	uint8_t er_id;
+	/* Event ring ID */
+
+	uint32_t intmod_cycles;
+	/* Interrupt moderation cycles */
+
+	uint32_t intmod_count;
+	/* Interrupt moderation count */
+
+	uint32_t msi_addr;
+	/* IOVA mapped MSI address for this ER */
+
+	uint64_t ring_iova;
+	/* IOVA mapped ring base address */
+
+	uint64_t ring_len;
+	/* Ring length in bytes */
+
+	uint64_t rp;
+	/* IOVA mapped Read pointer address */
+
+	uint64_t wp;
+	/* IOVA mapped Write pointer address */
+};
+
+struct ipa_mhi_alloc_channel_req_msg_v01 {
+	/* Mandatory */
+	uint32_t tr_info_arr_len;
+	/* Must be set to # of elements in tr_info_arr. */
+	struct ipa_mhi_tr_info_type_v01
+		tr_info_arr[QMI_IPA_REMOTE_MHI_CHANNELS_NUM_MAX_V01];
+	/* Array of TR context information for Remote MHI channels */
+
+	/* Mandatory */
+	uint32_t er_info_arr_len;
+	/* Must be set to # of elements in er_info_arr. */
+	struct ipa_mhi_er_info_type_v01
+		er_info_arr[QMI_IPA_REMOTE_MHI_CHANNELS_NUM_MAX_V01];
+	/* Array of ER context information for Remote MHI channels */
+
+	/* Mandatory */
+	uint32_t ctrl_addr_map_info_len;
+	/* Must be set to # of elements in ctrl_addr_map_info. */
+
+	struct ipa_mhi_mem_addr_info_type_v01
+	ctrl_addr_map_info[QMI_IPA_REMOTE_MHI_MEMORY_MAPPING_NUM_MAX_V01];
+	/*
+	 * List of PA-IOVA address mappings for control regions
+	 * used by Modem
+	 */
+
+	/* Mandatory */
+	uint32_t data_addr_map_info_len;
+	/* Must be set to # of elements in data_addr_map_info. */
+	struct ipa_mhi_mem_addr_info_type_v01
+	data_addr_map_info[QMI_IPA_REMOTE_MHI_MEMORY_MAPPING_NUM_MAX_V01];
+	/* List of PA-IOVA address mappings for data regions used by Modem */
+};
+#define IPA_MHI_ALLOC_CHANNEL_REQ_MSG_V01_MAX_MSG_LEN 808
+
+struct ipa_mhi_ch_alloc_resp_type_v01 {
+	uint8_t ch_id;
+	/* Remote MHI channel ID */
+
+	uint8_t is_success;
+	/* Channel Allocation Status */
+};
+
+struct ipa_mhi_alloc_channel_resp_msg_v01 {
+	/* Mandatory */
+	struct ipa_qmi_response_type_v01 resp;
+	/* Standard response type. Contains the following data members:
+	 * - qmi_result_type -- QMI_RESULT_SUCCESS or QMI_RESULT_FAILURE
+	 * - qmi_error_type  -- Error code. Possible error code values
+	 *			are described in the error codes section
+	 *			of each message definition.
+	 */
+
+	/* Optional */
+	uint8_t alloc_resp_arr_valid;
+	/* Must be set to true if alloc_resp_arr is being passed. */
+	uint32_t alloc_resp_arr_len;
+	/* Must be set to # of elements in alloc_resp_arr. */
+	struct ipa_mhi_ch_alloc_resp_type_v01
+		alloc_resp_arr[QMI_IPA_REMOTE_MHI_CHANNELS_NUM_MAX_V01];
+	/* MHI channel allocation response array */
+};
+#define IPA_MHI_ALLOC_CHANNEL_RESP_MSG_V01_MAX_MSG_LEN 23
+
+struct ipa_mhi_clk_vote_req_msg_v01 {
+	/* Mandatory */
+	uint8_t mhi_vote;
+	/*
+	 * MHI vote request
+	 * TRUE  - ON
+	 * FALSE - OFF
+	 */
+};
+#define IPA_MHI_CLK_VOTE_REQ_MSG_V01_MAX_MSG_LEN 4
+
+struct ipa_mhi_clk_vote_resp_msg_v01 {
+	/* Mandatory */
+	struct ipa_qmi_response_type_v01 resp;
+	/* Standard response type. Contains the following data members:
+	 * - qmi_result_type -- QMI_RESULT_SUCCESS or QMI_RESULT_FAILURE
+	 * - qmi_error_type  -- Error code. Possible error code values
+	 *			are described in the error codes section
+	 *			of each message definition.
+	 */
+};
+#define IPA_MHI_CLK_VOTE_RESP_MSG_V01_MAX_MSG_LEN 7
+
+struct ipa_mhi_cleanup_req_msg_v01 {
+	/* Optional */
+	uint8_t cleanup_valid;
+	/* Must be set to true if cleanup is being passed. */
+	uint8_t cleanup;
+	/*
+	 * a Flag to indicate the type of action
+	 * 1 - Cleanup Request
+	 */
+};
+#define IPA_MHI_CLEANUP_REQ_MSG_V01_MAX_MSG_LEN 4
+
+struct ipa_mhi_cleanup_resp_msg_v01 {
+	/* Mandatory */
+	struct ipa_qmi_response_type_v01 resp;
+	/* Standard response type. Contains the following data members:
+	 * - qmi_result_type -- QMI_RESULT_SUCCESS or QMI_RESULT_FAILURE
+	 * - qmi_error_type  -- Error code. Possible error code values
+	 *			are described in the error codes section
+	 *			of each message definition.
+	 */
+};
+#define IPA_MHI_CLEANUP_RESP_MSG_V01_MAX_MSG_LEN 7
+
 /*Service Message Definition*/
 #define QMI_IPA_INDICATION_REGISTER_REQ_V01 0x0020
 #define QMI_IPA_INDICATION_REGISTER_RESP_V01 0x0020
@@ -1945,9 +2246,16 @@ struct ipa_configure_ul_firewall_rules_ind_msg_v01 {
 #define QMI_IPA_INSTALL_UL_FIREWALL_RULES_REQ_V01 0x003A
 #define QMI_IPA_INSTALL_UL_FIREWALL_RULES_RESP_V01 0x003A
 #define QMI_IPA_INSTALL_UL_FIREWALL_RULES_IND_V01 0x003A
+#define QMI_IPA_MHI_CLK_VOTE_REQ_V01 0x003B
+#define QMI_IPA_MHI_CLK_VOTE_RESP_V01 0x003B
+#define QMI_IPA_MHI_READY_IND_V01 0x003C
+#define QMI_IPA_MHI_ALLOC_CHANNEL_REQ_V01 0x003D
+#define QMI_IPA_MHI_ALLOC_CHANNEL_RESP_V01 0x003D
+#define QMI_IPA_MHI_CLEANUP_REQ_V01 0x003E
+#define QMI_IPA_MHI_CLEANUP_RESP_V01 0x003E
 
 /* add for max length*/
-#define QMI_IPA_INIT_MODEM_DRIVER_REQ_MAX_MSG_LEN_V01 134
+#define QMI_IPA_INIT_MODEM_DRIVER_REQ_MAX_MSG_LEN_V01 162
 #define QMI_IPA_INIT_MODEM_DRIVER_RESP_MAX_MSG_LEN_V01 25
 #define QMI_IPA_INDICATION_REGISTER_REQ_MAX_MSG_LEN_V01 8
 #define QMI_IPA_INDICATION_REGISTER_RESP_MAX_MSG_LEN_V01 7
@@ -1996,5 +2304,12 @@ struct ipa_configure_ul_firewall_rules_ind_msg_v01 {
 #define QMI_IPA_INSTALL_UL_FIREWALL_RULES_RESP_MAX_MSG_LEN_V01 7
 #define QMI_IPA_INSTALL_UL_FIREWALL_RULES_IND_MAX_MSG_LEN_V01 11
 /* Service Object Accessor */
+
+/* This is the largest MAX_MSG_LEN we have for all the messages
+ * we expect to receive. This argument will be used in
+ * qmi_handle_init to allocate a receive buffer for the socket
+ * associated with our qmi_handle
+ */
+#define QMI_IPA_MAX_MSG_LEN 22685
 
 #endif/* IPA_QMI_SERVICE_V01_H */

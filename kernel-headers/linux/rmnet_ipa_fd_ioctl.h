@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -33,12 +33,13 @@
 #define WAN_IOCTL_QUERY_DL_FILTER_STATS  8
 #define WAN_IOCTL_ADD_FLT_RULE_EX        9
 #define WAN_IOCTL_QUERY_TETHER_STATS_ALL  10
-#define WAN_IOCTL_ADD_UL_FLT_RULE          11
-#define WAN_IOCTL_ENABLE_PER_CLIENT_STATS    12
-#define WAN_IOCTL_QUERY_PER_CLIENT_STATS     13
-#define WAN_IOCTL_SET_LAN_CLIENT_INFO        14
-#define WAN_IOCTL_CLEAR_LAN_CLIENT_INFO      15
-#define WAN_IOCTL_SEND_LAN_CLIENT_MSG        16
+#define WAN_IOCTL_NOTIFY_WAN_STATE  11
+#define WAN_IOCTL_ADD_UL_FLT_RULE          12
+#define WAN_IOCTL_ENABLE_PER_CLIENT_STATS    13
+#define WAN_IOCTL_QUERY_PER_CLIENT_STATS     14
+#define WAN_IOCTL_SET_LAN_CLIENT_INFO        15
+#define WAN_IOCTL_CLEAR_LAN_CLIENT_INFO      16
+#define WAN_IOCTL_SEND_LAN_CLIENT_MSG        17
 
 /* User space may not have this defined. */
 #ifndef IFNAMSIZ
@@ -132,6 +133,9 @@ struct wan_ioctl_query_dl_filter_stats {
 	uint32_t index;
 };
 
+struct wan_ioctl_notify_wan_state {
+	uint8_t up;
+};
 struct wan_ioctl_send_lan_client_msg {
 	/* Lan client info. */
 	struct ipa_lan_client_msg lan_client;
@@ -226,6 +230,10 @@ struct wan_ioctl_query_per_client_stats {
 #define WAN_IOC_QUERY_TETHER_STATS_ALL _IOWR(WAN_IOC_MAGIC, \
 		WAN_IOCTL_QUERY_TETHER_STATS_ALL, \
 		struct wan_ioctl_query_tether_stats_all *)
+
+#define WAN_IOC_NOTIFY_WAN_STATE _IOWR(WAN_IOC_MAGIC, \
+		WAN_IOCTL_NOTIFY_WAN_STATE, \
+		struct wan_ioctl_notify_wan_state *)
 
 #define WAN_IOC_ADD_UL_FLT_RULE _IOWR(WAN_IOC_MAGIC, \
 		WAN_IOCTL_ADD_UL_FLT_RULE, \

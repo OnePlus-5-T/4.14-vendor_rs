@@ -1,19 +1,13 @@
-/*
- * Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
 #ifndef _CALIB_HWDEP_H
 #define _CALIB_HWDEP_H
 
+ #ifndef __user
+  #define __user
+ #endif
+
 #define WCD9XXX_CODEC_HWDEP_NODE    1000
+#define AQT1000_CODEC_HWDEP_NODE    1001
+#define Q6AFE_HWDEP_NODE    1002
 enum wcd_cal_type {
 	WCD9XXX_MIN_CAL,
 	WCD9XXX_ANC_CAL = WCD9XXX_MIN_CAL,
@@ -31,5 +25,20 @@ struct wcdcal_ioctl_buffer {
 
 #define SNDRV_CTL_IOCTL_HWDEP_CAL_TYPE \
 	_IOW('U', 0x1, struct wcdcal_ioctl_buffer)
+
+enum q6afe_cal_type {
+	Q6AFE_MIN_CAL,
+	Q6AFE_VAD_CORE_CAL = Q6AFE_MIN_CAL,
+	Q6AFE_MAX_CAL,
+};
+
+struct q6afecal_ioctl_buffer {
+	__u32 size;
+	__u8 *buffer;
+	enum q6afe_cal_type cal_type;
+};
+
+#define SNDRV_IOCTL_HWDEP_VAD_CAL_TYPE \
+	_IOW('U', 0x1, struct q6afecal_ioctl_buffer)
 
 #endif /*_CALIB_HWDEP_H*/

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef _LINUX_SOCKET_H
 #define _LINUX_SOCKET_H
 
@@ -17,5 +18,7 @@ struct __kernel_sockaddr_storage {
 				/* space to achieve desired size, */
 				/* _SS_MAXSIZE value minus size of ss_family */
 } __attribute__ ((aligned(_K_SS_ALIGNSIZE)));	/* force desired alignment */
+
+ #define sockaddr_storage __kernel_sockaddr_storage
 
 #endif /* _LINUX_SOCKET_H */

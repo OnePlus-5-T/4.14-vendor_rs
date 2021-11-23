@@ -2,25 +2,31 @@
  * Copyright (C) 2013 Red Hat
  * Author: Rob Clark <robdclark@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 #ifndef __MSM_DRM_H__
 #define __MSM_DRM_H__
 
-#include <stddef.h>
-#include <drm/drm.h>
-#include <drm/sde_drm.h>
+#include "drm.h"
+#include "sde_drm.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -62,15 +68,6 @@ struct drm_msm_timespec {
 	__s64 tv_nsec;         /* nanoseconds */
 };
 
-/* From CEA.861.3 */
-#define HDR_EOTF_SMTPE_ST2084	0x2
-#define HDR_EOTF_HLG		0x3
-
-/* hdr hdmi state takes possible values of 0, 1 and 2 respectively */
-#define DRM_MSM_HDR_DISABLE  0
-#define DRM_MSM_HDR_ENABLE   1
-#define DRM_MSM_HDR_RESET    2
-
 /*
  * HDR Metadata
  * These are defined as per EDID spec and shall be used by the sink
@@ -79,7 +76,15 @@ struct drm_msm_timespec {
 
 #define HDR_PRIMARIES_COUNT   3
 
-struct drm_msm_ext_panel_hdr_metadata {
+/* HDR EOTF */
+#define HDR_EOTF_SDR_LUM_RANGE	0x0
+#define HDR_EOTF_HDR_LUM_RANGE	0x1
+#define HDR_EOTF_SMTPE_ST2084	0x2
+#define HDR_EOTF_HLG		0x3
+
+#define DRM_MSM_EXT_HDR_METADATA
+struct drm_msm_ext_hdr_metadata {
+	__u32 hdr_state;        /* HDR state */
 	__u32 eotf;             /* electro optical transfer function */
 	__u32 hdr_supported;    /* HDR supported */
 	__u32 display_primaries_x[HDR_PRIMARIES_COUNT]; /* Primaries x */
@@ -93,26 +98,12 @@ struct drm_msm_ext_panel_hdr_metadata {
 };
 
 /**
- * HDR Control
- * This encapsulates the HDR metadata as well as a state control
- * for the HDR metadata as required by the HDMI spec to send the
- * relevant metadata depending on the state of the HDR playback.
- * hdr_state: Controls HDR state, takes values ENABLE(1)/DISABLE(0)
- * hdr_meta: Metadata sent by the userspace for the HDR clip
- */
-
-#define DRM_MSM_EXT_PANEL_HDR_CTRL
-struct drm_msm_ext_panel_hdr_ctrl {
-	__u8 hdr_state;                                 /* HDR state */
-	struct drm_msm_ext_panel_hdr_metadata hdr_meta; /* HDR metadata */
-};
-
-/**
  * HDR sink properties
  * These are defined as per EDID spec and shall be used by the userspace
  * to determine the HDR properties to be set to the sink.
  */
-struct drm_msm_ext_panel_hdr_properties {
+#define DRM_MSM_EXT_HDR_PROPERTIES
+struct drm_msm_ext_hdr_properties {
 	__u8 hdr_metadata_type_one;   /* static metadata type one */
 	__u32 hdr_supported;          /* HDR supported */
 	__u32 hdr_eotf;               /* electro optical transfer function */
@@ -121,14 +112,12 @@ struct drm_msm_ext_panel_hdr_properties {
 	__u32 hdr_min_luminance;      /* Min Luminance */
 };
 
-#define MSM_PARAM_GPU_ID             0x01
-#define MSM_PARAM_GMEM_SIZE          0x02
-#define MSM_PARAM_CHIP_ID            0x03
-#define MSM_PARAM_MAX_FREQ           0x04
-#define MSM_PARAM_TIMESTAMP          0x05
-#define MSM_PARAM_GMEM_BASE          0x06
-#define MSM_PARAM_NR_RINGS           0x07
-#define MSM_PARAM_GPU_HANG_TIMEOUT   0xa0 /* timeout in ms */
+#define MSM_PARAM_GPU_ID     0x01
+#define MSM_PARAM_GMEM_SIZE  0x02
+#define MSM_PARAM_CHIP_ID    0x03
+#define MSM_PARAM_MAX_FREQ   0x04
+#define MSM_PARAM_TIMESTAMP  0x05
+#define MSM_PARAM_GMEM_BASE  0x06
 
 struct drm_msm_param {
 	__u32 pipe;           /* in, MSM_PIPE_x */
@@ -142,8 +131,6 @@ struct drm_msm_param {
 
 #define MSM_BO_SCANOUT       0x00000001     /* scanout capable */
 #define MSM_BO_GPU_READONLY  0x00000002
-#define MSM_BO_PRIVILEGED    0x00000004
-#define MSM_BO_SECURE        0x00000008	    /* Allocate and map as secure */
 #define MSM_BO_CACHE_MASK    0x000f0000
 /* cache modes */
 #define MSM_BO_CACHED        0x00010000
@@ -152,20 +139,12 @@ struct drm_msm_param {
 
 #define MSM_BO_FLAGS         (MSM_BO_SCANOUT | \
                               MSM_BO_GPU_READONLY | \
-                              MSM_BO_SECURE | \
                               MSM_BO_CACHED | \
                               MSM_BO_WC | \
                               MSM_BO_UNCACHED)
 
 struct drm_msm_gem_new {
 	__u64 size;           /* in */
-	__u32 flags;          /* in, mask of MSM_BO_x */
-	__u32 handle;         /* out */
-};
-
-struct drm_msm_gem_svm_new {
-	__u64 hostptr;        /* in, must be page-aligned */
-	__u64 size;           /* in, must be page-aligned */
 	__u32 flags;          /* in, mask of MSM_BO_x */
 	__u32 handle;         /* out */
 };
@@ -230,13 +209,10 @@ struct drm_msm_gem_submit_reloc {
  *      this buffer in the first-level ringbuffer
  *   CTX_RESTORE_BUF - only executed if there has been a GPU context
  *      switch since the last SUBMIT ioctl
- *   PROFILE_BUF - A profiling buffer written to by both GPU and CPU.
  */
 #define MSM_SUBMIT_CMD_BUF             0x0001
 #define MSM_SUBMIT_CMD_IB_TARGET_BUF   0x0002
 #define MSM_SUBMIT_CMD_CTX_RESTORE_BUF 0x0003
-#define MSM_SUBMIT_CMD_PROFILE_BUF     0x0004
-
 struct drm_msm_gem_submit_cmd {
 	__u32 type;           /* in, one of MSM_SUBMIT_CMD_x */
 	__u32 submit_idx;     /* in, index of submit_bo cmdstream buffer */
@@ -270,10 +246,14 @@ struct drm_msm_gem_submit_bo {
 };
 
 /* Valid submit ioctl flags: */
-#define MSM_SUBMIT_RING_MASK 0x000F0000
-#define MSM_SUBMIT_RING_SHIFT 16
-
-#define MSM_SUBMIT_FLAGS (MSM_SUBMIT_RING_MASK)
+#define MSM_SUBMIT_NO_IMPLICIT   0x80000000 /* disable implicit sync */
+#define MSM_SUBMIT_FENCE_FD_IN   0x40000000 /* enable input fence_fd */
+#define MSM_SUBMIT_FENCE_FD_OUT  0x20000000 /* enable output fence_fd */
+#define MSM_SUBMIT_FLAGS                ( \
+		MSM_SUBMIT_NO_IMPLICIT   | \
+		MSM_SUBMIT_FENCE_FD_IN   | \
+		MSM_SUBMIT_FENCE_FD_OUT  | \
+		0)
 
 /* Each cmdstream submit consists of a table of buffers involved, and
  * one or more cmdstream buffers.  This allows for conditional execution
@@ -284,24 +264,9 @@ struct drm_msm_gem_submit {
 	__u32 fence;          /* out */
 	__u32 nr_bos;         /* in, number of submit_bo's */
 	__u32 nr_cmds;        /* in, number of submit_cmd's */
-	__u64 bos;     /* in, ptr to array of submit_bo's */
-	__u64 cmds;    /* in, ptr to array of submit_cmd's */
-	__s32 fence_fd;       /* gap for the fence_fd which is upstream */
-	__u32 queueid;         /* in, submitqueue id */
-};
-
-/*
- * Define a preprocessor variable to let the userspace know that
- * drm_msm_gem_submit_profile_buffer switched to only support a kernel timestamp
- * for submit time
- */
-#define MSM_PROFILE_BUFFER_SUBMIT_TIME 1
-
-struct drm_msm_gem_submit_profile_buffer {
-	struct drm_msm_timespec time;   /* out, submission time */
-	__u64 ticks_queued;    /* out, GPU ticks at ringbuffer submission */
-	__u64 ticks_submitted; /* out, GPU ticks before cmdstream execution*/
-	__u64 ticks_retired;   /* out, GPU ticks after cmdstream execution */
+	__u64 bos;            /* in, ptr to array of submit_bo's */
+	__u64 cmds;           /* in, ptr to array of submit_cmd's */
+	__s32 fence_fd;       /* in/out fence fd (see MSM_SUBMIT_FENCE_FD_IN/OUT) */
 };
 
 /* The normal way to synchronize with the GPU is just to CPU_PREP on
@@ -317,15 +282,60 @@ struct drm_msm_wait_fence {
 	struct drm_msm_timespec timeout;   /* in */
 };
 
+/* madvise provides a way to tell the kernel in case a buffers contents
+ * can be discarded under memory pressure, which is useful for userspace
+ * bo cache where we want to optimistically hold on to buffer allocate
+ * and potential mmap, but allow the pages to be discarded under memory
+ * pressure.
+ *
+ * Typical usage would involve madvise(DONTNEED) when buffer enters BO
+ * cache, and madvise(WILLNEED) if trying to recycle buffer from BO cache.
+ * In the WILLNEED case, 'retained' indicates to userspace whether the
+ * backing pages still exist.
+ */
+#define MSM_MADV_WILLNEED 0       /* backing pages are needed, status returned in 'retained' */
+#define MSM_MADV_DONTNEED 1       /* backing pages not needed */
+#define __MSM_MADV_PURGED 2       /* internal state */
+
+struct drm_msm_gem_madvise {
+	__u32 handle;         /* in, GEM handle */
+	__u32 madv;           /* in, MSM_MADV_x */
+	__u32 retained;       /* out, whether backing store still exists */
+};
+
+/* HDR WRGB x and y index */
+#define DISPLAY_PRIMARIES_WX 0
+#define DISPLAY_PRIMARIES_WY 1
+#define DISPLAY_PRIMARIES_RX 2
+#define DISPLAY_PRIMARIES_RY 3
+#define DISPLAY_PRIMARIES_GX 4
+#define DISPLAY_PRIMARIES_GY 5
+#define DISPLAY_PRIMARIES_BX 6
+#define DISPLAY_PRIMARIES_BY 7
+#define DISPLAY_PRIMARIES_MAX 8
+
+struct drm_panel_hdr_properties {
+	__u32 hdr_enabled;
+
+	/* WRGB X and y values arrayed in format */
+	/* [WX, WY, RX, RY, GX, GY, BX, BY] */
+	__u32 display_primaries[DISPLAY_PRIMARIES_MAX];
+
+	/* peak brightness supported by panel */
+	__u32 peak_brightness;
+	/* Blackness level supported by panel */
+	__u32 blackness_level;
+};
+
 /**
  * struct drm_msm_event_req - Payload to event enable/disable ioctls.
- * @object_id: DRM object id. Ex: for crtc pass crtc id.
- * @object_type: DRM object type. Ex: for crtc set it to DRM_MODE_OBJECT_CRTC.
+ * @object_id: DRM object id. e.g.: for crtc pass crtc id.
+ * @object_type: DRM object type. e.g.: for crtc set it to DRM_MODE_OBJECT_CRTC.
  * @event: Event for which notification is being enabled/disabled.
- *         Ex: for Histogram set - DRM_EVENT_HISTOGRAM.
+ *         e.g.: for Histogram set - DRM_EVENT_HISTOGRAM.
  * @client_context: Opaque pointer that will be returned during event response
  *                  notification.
- * @index: Object index(ex: crtc index), optional for user-space to set.
+ * @index: Object index(e.g.: crtc index), optional for user-space to set.
  *         Driver will override value based on object_id and object_type.
  */
 struct drm_msm_event_req {
@@ -350,106 +360,14 @@ struct drm_msm_event_resp {
 	__u8 data[];
 };
 
-#define MSM_COUNTER_GROUP_CP 0
-#define MSM_COUNTER_GROUP_RBBM 1
-#define MSM_COUNTER_GROUP_PC 2
-#define MSM_COUNTER_GROUP_VFD 3
-#define MSM_COUNTER_GROUP_HLSQ 4
-#define MSM_COUNTER_GROUP_VPC 5
-#define MSM_COUNTER_GROUP_TSE 6
-#define MSM_COUNTER_GROUP_RAS 7
-#define MSM_COUNTER_GROUP_UCHE 8
-#define MSM_COUNTER_GROUP_TP 9
-#define MSM_COUNTER_GROUP_SP 10
-#define MSM_COUNTER_GROUP_RB 11
-#define MSM_COUNTER_GROUP_VBIF 12
-#define MSM_COUNTER_GROUP_VBIF_PWR 13
-#define MSM_COUNTER_GROUP_VSC 23
-#define MSM_COUNTER_GROUP_CCU 24
-#define MSM_COUNTER_GROUP_LRZ 25
-#define MSM_COUNTER_GROUP_CMP 26
-#define MSM_COUNTER_GROUP_ALWAYSON 27
-#define MSM_COUNTER_GROUP_SP_PWR 28
-#define MSM_COUNTER_GROUP_TP_PWR 29
-#define MSM_COUNTER_GROUP_RB_PWR 30
-#define MSM_COUNTER_GROUP_CCU_PWR 31
-#define MSM_COUNTER_GROUP_UCHE_PWR 32
-#define MSM_COUNTER_GROUP_CP_PWR 33
-#define MSM_COUNTER_GROUP_GPMU_PWR 34
-#define MSM_COUNTER_GROUP_ALWAYSON_PWR 35
-
 /**
- * struct drm_msm_counter - allocate or release a GPU performance counter
- * @groupid: The group ID of the counter to get/put
- * @counterid: For GET returns the counterid that was assigned. For PUT
- *	       release the counter identified by groupid/counterid
- * @countable: For GET the countable for the counter
+ * struct drm_msm_power_ctrl: Payload to enable/disable the power vote
+ * @enable: enable/disable the power vote
+ * @flags:  operation control flags, for future use
  */
-struct drm_msm_counter {
-	__u32 groupid;
-	int counterid;
-	__u32 countable;
-	__u32 counter_lo;
-	__u32 counter_hi;
-};
-
-struct drm_msm_counter_read_op {
-	__u64 value;
-	__u32 groupid;
-	int counterid;
-};
-
-/**
- * struct drm_msm_counter_read - Read a number of GPU performance counters
- * ops: Pointer to the list of struct drm_msm_counter_read_op operations
- * nr_ops: Number of operations in the list
- */
-struct drm_msm_counter_read {
-	__u64 ops;
-	__u32 nr_ops;
-};
-
-#define MSM_GEM_SYNC_TO_DEV 0
-#define MSM_GEM_SYNC_TO_CPU 1
-
-struct drm_msm_gem_syncop {
-	__u32 handle;
-	__u32 op;
-};
-
-struct drm_msm_gem_sync {
-	__u32 nr_ops;
-	__u64 ops;
-};
-
-/*
- * Draw queues allow the user to set specific submission parameter. Command
- * submissions will specify a specific submit queue id to use. id '0' is
- * reserved as a "default" drawqueue with medium priority. The user can safely
- * use and query 0 but cannot destroy it.
- */
-
-/*
- * Allows a process to bypass the 2 second quality of service timeout.
- * Only CAP_SYS_ADMIN capable processes can set this flag.
- */
-#define MSM_SUBMITQUEUE_BYPASS_QOS_TIMEOUT 0x00000001
-
-#define MSM_SUBMITQUEUE_FLAGS (MSM_SUBMITQUEUE_BYPASS_QOS_TIMEOUT)
-
-struct drm_msm_submitqueue {
-	__u32 flags;   /* in, MSM_SUBMITQUEUE_x */
-	__u32 prio;    /* in, Priority level */
-	__u32 id;      /* out, identifier */
-};
-
-#define MSM_SUBMITQUEUE_PARAM_FAULTS 0
-
-struct drm_msm_submitqueue_query {
-	__u64 data;
-	__u32 id;
-	__u32 param;
-	__u32 len;
+struct drm_msm_power_ctrl {
+	__u32 enable;
+	__u32 flags;
 };
 
 #define DRM_MSM_GET_PARAM              0x00
@@ -462,28 +380,23 @@ struct drm_msm_submitqueue_query {
 #define DRM_MSM_GEM_CPU_FINI           0x05
 #define DRM_MSM_GEM_SUBMIT             0x06
 #define DRM_MSM_WAIT_FENCE             0x07
-/* Gap for upstream DRM_MSM_GEM_MADVISE */
-#define DRM_MSM_GEM_SVM_NEW            0x09
-#define DRM_MSM_SUBMITQUEUE_NEW        0x0A
-#define DRM_MSM_SUBMITQUEUE_CLOSE      0x0B
-#define DRM_MSM_SUBMITQUEUE_QUERY      0x0C
+#define DRM_MSM_GEM_MADVISE            0x08
 
 #define DRM_SDE_WB_CONFIG              0x40
 #define DRM_MSM_REGISTER_EVENT         0x41
 #define DRM_MSM_DEREGISTER_EVENT       0x42
-#define DRM_MSM_COUNTER_GET            0x43
-#define DRM_MSM_COUNTER_PUT            0x44
-#define DRM_MSM_COUNTER_READ           0x45
-#define DRM_MSM_GEM_SYNC               0x46
-#define DRM_MSM_RMFB2                  0x47
+#define DRM_MSM_RMFB2                  0x43
+#define DRM_MSM_POWER_CTRL             0x44
 
-/**
- * Currently DRM framework supports only VSYNC event.
- * Starting the custom events at 0xff to provide space for DRM
- * framework to add new events.
- */
-#define DRM_EVENT_HISTOGRAM 0xff
-#define DRM_EVENT_AD 0x100
+/* sde custom events */
+#define DRM_EVENT_HISTOGRAM 0x80000000
+#define DRM_EVENT_AD_BACKLIGHT 0x80000001
+#define DRM_EVENT_CRTC_POWER 0x80000002
+#define DRM_EVENT_SYS_BACKLIGHT 0x80000003
+#define DRM_EVENT_SDE_POWER 0x80000004
+#define DRM_EVENT_IDLE_NOTIFY 0x80000005
+#define DRM_EVENT_PANEL_DEAD 0x80000006 /* ESD event */
+#define DRM_EVENT_SDE_HW_RECOVERY 0X80000007
 
 #define DRM_IOCTL_MSM_GET_PARAM        DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GET_PARAM, struct drm_msm_param)
 #define DRM_IOCTL_MSM_GEM_NEW          DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_NEW, struct drm_msm_gem_new)
@@ -492,35 +405,17 @@ struct drm_msm_submitqueue_query {
 #define DRM_IOCTL_MSM_GEM_CPU_FINI     DRM_IOW (DRM_COMMAND_BASE + DRM_MSM_GEM_CPU_FINI, struct drm_msm_gem_cpu_fini)
 #define DRM_IOCTL_MSM_GEM_SUBMIT       DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_SUBMIT, struct drm_msm_gem_submit)
 #define DRM_IOCTL_MSM_WAIT_FENCE       DRM_IOW (DRM_COMMAND_BASE + DRM_MSM_WAIT_FENCE, struct drm_msm_wait_fence)
+#define DRM_IOCTL_MSM_GEM_MADVISE      DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_MADVISE, struct drm_msm_gem_madvise)
 #define DRM_IOCTL_SDE_WB_CONFIG \
 	DRM_IOW((DRM_COMMAND_BASE + DRM_SDE_WB_CONFIG), struct sde_drm_wb_cfg)
 #define DRM_IOCTL_MSM_REGISTER_EVENT   DRM_IOW((DRM_COMMAND_BASE + \
 			DRM_MSM_REGISTER_EVENT), struct drm_msm_event_req)
 #define DRM_IOCTL_MSM_DEREGISTER_EVENT DRM_IOW((DRM_COMMAND_BASE + \
 			DRM_MSM_DEREGISTER_EVENT), struct drm_msm_event_req)
-#define DRM_IOCTL_MSM_COUNTER_GET \
-	DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_COUNTER_GET, struct drm_msm_counter)
-#define DRM_IOCTL_MSM_COUNTER_PUT \
-	DRM_IOW(DRM_COMMAND_BASE + DRM_MSM_COUNTER_PUT, struct drm_msm_counter)
-#define DRM_IOCTL_MSM_COUNTER_READ \
-	DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_COUNTER_READ, \
-		struct drm_msm_counter_read)
-#define DRM_IOCTL_MSM_GEM_SYNC DRM_IOW(DRM_COMMAND_BASE + DRM_MSM_GEM_SYNC,\
-		struct drm_msm_gem_sync)
-#define DRM_IOCTL_MSM_GEM_SVM_NEW \
-	DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_SVM_NEW, \
-		struct drm_msm_gem_svm_new)
-#define DRM_IOCTL_MSM_SUBMITQUEUE_NEW \
-	DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_SUBMITQUEUE_NEW, \
-		struct drm_msm_submitqueue)
-#define DRM_IOCTL_MSM_SUBMITQUEUE_CLOSE \
-	DRM_IOW(DRM_COMMAND_BASE + DRM_MSM_SUBMITQUEUE_CLOSE, \
-		struct drm_msm_submitqueue)
-#define DRM_IOCTL_MSM_SUBMITQUEUE_QUERY \
-	DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_SUBMITQUEUE_QUERY, \
-		struct drm_msm_submitqueue_query)
 #define DRM_IOCTL_MSM_RMFB2 DRM_IOW((DRM_COMMAND_BASE + \
 			DRM_MSM_RMFB2), unsigned int)
+#define DRM_IOCTL_MSM_POWER_CTRL DRM_IOW((DRM_COMMAND_BASE + \
+			DRM_MSM_POWER_CTRL), struct drm_msm_power_ctrl)
 
 #if defined(__cplusplus)
 }

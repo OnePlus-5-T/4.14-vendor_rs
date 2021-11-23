@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *  compress_offload.h - compress offload header definations
  *
@@ -63,6 +64,7 @@ struct snd_compr_params {
  * @pcm_io_frames: Frames rendered or received by DSP into a mixer or an audio
  * output/input. This field should be used for A/V sync or time estimates.
  * @sampling_rate: sampling rate of audio
+ * @timestamp: timestamp of audio clips
  */
 struct snd_compr_tstamp {
 	__u32 byte_offset;
@@ -134,6 +136,7 @@ struct snd_compr_audio_info {
 
 #define SNDRV_COMPRESS_RENDER_MODE_AUDIO_MASTER 0
 #define SNDRV_COMPRESS_RENDER_MODE_STC_MASTER 1
+#define SNDRV_COMPRESS_RENDER_MODE_TTP 2
 
 #define SNDRV_COMPRESS_CLK_REC_MODE_NONE 0
 #define SNDRV_COMPRESS_CLK_REC_MODE_AUTO 1
@@ -172,13 +175,15 @@ enum sndrv_compress_encoder {
 	SNDRV_COMPRESS_LATENCY_MODE = 12,
 };
 
+#define SNDRV_COMPRESS_MIN_BLK_SIZE SNDRV_COMPRESS_MIN_BLK_SIZE
+#define SNDRV_COMPRESS_MAX_BLK_SIZE SNDRV_COMPRESS_MAX_BLK_SIZE
 #define SNDRV_COMPRESS_PATH_DELAY SNDRV_COMPRESS_PATH_DELAY
 #define SNDRV_COMPRESS_RENDER_MODE SNDRV_COMPRESS_RENDER_MODE
 #define SNDRV_COMPRESS_CLK_REC_MODE SNDRV_COMPRESS_CLK_REC_MODE
 #define SNDRV_COMPRESS_RENDER_WINDOW SNDRV_COMPRESS_RENDER_WINDOW
 #define SNDRV_COMPRESS_START_DELAY SNDRV_COMPRESS_START_DELAY
 #define SNDRV_COMPRESS_ENABLE_ADJUST_SESSION_CLOCK \
-			SNDRV_COMPRESS_ENABLE_ADJUST_SESSION_CLOCK
+		SNDRV_COMPRESS_ENABLE_ADJUST_SESSION_CLOCK
 #define SNDRV_COMPRESS_ADJUST_SESSION_CLOCK SNDRV_COMPRESS_ADJUST_SESSION_CLOCK
 #define SNDRV_COMPRESS_LATENCY_MODE SNDRV_COMPRESS_LATENCY_MODE
 
@@ -241,4 +246,5 @@ struct snd_compr_metadata {
 #define SND_COMPR_TRIGGER_DRAIN 7 /*FIXME move this to pcm.h */
 #define SND_COMPR_TRIGGER_NEXT_TRACK 8
 #define SND_COMPR_TRIGGER_PARTIAL_DRAIN 9
+#define SNDRV_COMPRESS_DSP_POSITION 10
 #endif

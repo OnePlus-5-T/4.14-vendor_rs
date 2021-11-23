@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * Copyright (c) 1999-2002 Vojtech Pavlik
  *
@@ -93,6 +94,8 @@ struct input_absinfo {
  * (depending on which element was used to perform lookup).
  */
 struct input_keymap_entry {
+#define SYN_TIME_SEC		4
+#define SYN_TIME_NSEC		5
 #define INPUT_KEYMAP_BY_INDEX	(1 << 0)
 	__u8  flags;
 	__u8  len;
@@ -163,50 +166,6 @@ struct input_mask {
 
 #define EVIOCGRAB		_IOW('E', 0x90, int)			/* Grab/Release device */
 #define EVIOCREVOKE		_IOW('E', 0x91, int)			/* Revoke device access */
-
-#define EVIOCSCLOCKID		_IOW('E', 0xa0, int)			/* Set clockid to be used for timestamps */
-
-/*
- * Device properties and quirks
- */
-
-/* HACK: disable conflicting EVIOCREVOKE until Android userspace stops using EVIOCSSUSPENDBLOCK */
-/*#define EVIOCREVOKE		_IOW('E', 0x91, int)*/			/* Revoke device access */
-
-#define INPUT_PROP_POINTER		0x00	/* needs a pointer */
-#define INPUT_PROP_DIRECT		0x01	/* direct input devices */
-#define INPUT_PROP_BUTTONPAD		0x02	/* has button(s) under pad */
-#define INPUT_PROP_SEMI_MT		0x03	/* touch rectangle only */
-#define INPUT_PROP_TOPBUTTONPAD		0x04	/* softbuttons at top of pad */
-#define INPUT_PROP_POINTING_STICK	0x05	/* is a pointing stick */
-#define INPUT_PROP_NO_DUMMY_RELEASE	0x06	/* no dummy event */
-
-#define INPUT_PROP_MAX			0x1f
-#define INPUT_PROP_CNT			(INPUT_PROP_MAX + 1)
-
-/*
- * Event types
- */
-
-#define EV_SYN			0x00
-#define EV_KEY			0x01
-#define EV_REL			0x02
-#define EV_ABS			0x03
-#define EV_MSC			0x04
-#define EV_SW			0x05
-#define EV_LED			0x11
-#define EV_SND			0x12
-#define EV_REP			0x14
-#define EV_FF			0x15
-#define EV_PWR			0x16
-#define EV_FF_STATUS		0x17
-#define EV_MAX			0x1f
-#define EV_CNT			(EV_MAX+1)
-
-/*
- * Synchronization events.
- */
-
 
 /**
  * EVIOCGMASK - Retrieve current event mask
@@ -293,6 +252,9 @@ struct input_mask {
 #define BUS_GSC			0x1A
 #define BUS_ATARI		0x1B
 #define BUS_SPI			0x1C
+#define BUS_RMI			0x1D
+#define BUS_CEC			0x1E
+#define BUS_INTEL_ISHTP		0x1F
 
 /*
  * MT_TOOL types

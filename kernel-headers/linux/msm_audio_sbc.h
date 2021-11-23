@@ -4,10 +4,10 @@
 #include <linux/msm_audio.h>
 
 #define AUDIO_SET_SBC_ENC_CONFIG  _IOW(AUDIO_IOCTL_MAGIC, \
-  (AUDIO_MAX_COMMON_IOCTL_NUM+0), struct msm_audio_sbc_enc_config)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+0), struct msm_audio_sbc_enc_config)
 
 #define AUDIO_GET_SBC_ENC_CONFIG  _IOR(AUDIO_IOCTL_MAGIC, \
-  (AUDIO_MAX_COMMON_IOCTL_NUM+1), struct msm_audio_sbc_enc_config)
+	(AUDIO_MAX_COMMON_IOCTL_NUM+1), struct msm_audio_sbc_enc_config)
 
 #define AUDIO_SBC_BA_LOUDNESS		0x0
 #define AUDIO_SBC_BA_SNR		0x1

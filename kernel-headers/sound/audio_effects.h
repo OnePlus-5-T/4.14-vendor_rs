@@ -1,16 +1,3 @@
-/*
- * Copyright (c) 2013-2015, 2017 The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
-
 #ifndef _AUDIO_EFFECTS_H
 #define _AUDIO_EFFECTS_H
 
@@ -24,27 +11,26 @@
 
 /* CONFIG HEADER */
 /*
-
-	MODULE_ID,
-	DEVICE,
-	NUM_COMMANDS,
-	COMMAND_ID_1,
-	CONFIG_CACHE/SET/GET,
-	OFFSET_1,
-	LENGTH_1,
-	VALUES_1,
-	...,
-	...,
-	COMMAND_ID_2,
-	CONFIG_CACHE/SET/GET,
-	OFFSET_2,
-	LENGTH_2,
-	VALUES_2,
-	...,
-	...,
-	COMMAND_ID_3,
-	...
-*/
+ * MODULE_ID,
+ * DEVICE,
+ * NUM_COMMANDS,
+ * COMMAND_ID_1,
+ * CONFIG_CACHE/SET/GET,
+ * OFFSET_1,
+ * LENGTH_1,
+ * VALUES_1,
+ * ...,
+ * ...,
+ * COMMAND_ID_2,
+ * CONFIG_CACHE/SET/GET,
+ * OFFSET_2,
+ * LENGTH_2,
+ * VALUES_2,
+ * ...,
+ * ...,
+ * COMMAND_ID_3,
+ * ...
+ */
 
 
 /* CONFIG PARAM IDs */
