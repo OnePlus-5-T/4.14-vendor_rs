@@ -1,2 +1,4 @@
 allow ims radio_control_prop:file { getattr open read };
 allow ims diag_device:chr_file { open read write ioctl };
+
+allow ims sysfs:file { open read };

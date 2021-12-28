@@ -1,0 +1,2 @@
+allow sensors proc_cmdline:file getattr;
+allow sensors sysfs:file { open read };

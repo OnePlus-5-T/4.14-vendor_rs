@@ -1,0 +1,4 @@
+allow init binderfs:chr_file setattr;
+allow init bt_firmware_file:filesystem getattr;
+allow init firmware_file:filesystem getattr;
+allow init sysfs:file { setattr };

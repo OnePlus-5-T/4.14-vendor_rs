@@ -1,0 +1,4 @@
+allow timekeep_app content_capture_service:service_manager find;
+allow timekeep_app game_service:service_manager find;
+
+allow timekeep_app sysfs:file { getattr open read };

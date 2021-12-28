@@ -24,6 +24,9 @@ PRODUCT_COPY_FILES += \
 include device/lineage/sepolicy/common/sepolicy.mk
 BOARD_SEPOLICY_DIRS += vendor/rs/sepolicy
 
+BOARD_PLAT_PRIVATE_SEPOLICY_DIR += \
+    vendor/rs/sepolicy/private
+
 SKIP_BOOT_JARS_CHECK := true
 
 # Explicitly disable AVB

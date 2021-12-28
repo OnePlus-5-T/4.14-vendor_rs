@@ -1,0 +1,1 @@
+allow init-radio-sh self:capability chown;

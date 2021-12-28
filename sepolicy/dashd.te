@@ -1,0 +1,3 @@
+allow dashd postinstall_mnt_dir:dir getattr;
+allow dashd sysfs:file { open read };
+allow dashd system_data_root_file:dir read;

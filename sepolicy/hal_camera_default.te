@@ -1,0 +1,1 @@
+allow hal_camera_default bootanim_system_prop:file { getattr map open read };
