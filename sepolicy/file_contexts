@@ -2,3 +2,6 @@
 # tri-state-key
 /system/bin/tri-state-key_daemon                                                        u:object_r:tri-state-key_daemon_exec:s0
 /vendor/bin/hw/light_daemon                                                             u:object_r:hal_light_default_exec:s0
+
+# NFC on kernel 4.14
+/dev/pn54x                                                                              u:object_r:nfc_device:s0
