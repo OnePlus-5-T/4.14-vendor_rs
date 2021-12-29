@@ -1,0 +1,4 @@
+allow qtidataservices_app system_data_file:dir search;
+allow qtidataservices_app user_profile_root_file:dir search;
+allow qtidataservices_app sysfs:file { read open };
+allow qtidataservices_app location:binder call;
