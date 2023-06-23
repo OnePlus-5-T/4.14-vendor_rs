@@ -4,9 +4,11 @@ service tri-state-key_daemon /system/bin/tri-state-key_daemon
     group root uhid
 
 on property:sys.slider_up.vibrate=1
-    write /sys/devices/virtual/timed_output/vibrator/enable 300
+    write /sys/class/leds/vibrator/duration 300
+    write /sys/class/leds/vibrator/activate 1
     setprop sys.slider_up.vibrate ""
 
 on property:sys.slider_middle.vibrate=1
-    write /sys/devices/virtual/timed_output/vibrator/enable 200
+    write /sys/class/leds/vibrator/duration 200
+    write /sys/class/leds/vibrator/activate 1
     setprop sys.slider_middle.vibrate ""

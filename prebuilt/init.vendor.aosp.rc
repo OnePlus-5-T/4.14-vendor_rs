@@ -15,8 +15,7 @@ on boot
     setprop ro.boot.wificountrycode 00
 
 on post-fs
-    chown system system /sys/class/timed_output/vibrator/vmax_mv
-    chown system system /sys/class/timed_output/vibrator/vtg_level
+    chown system system /sys/class/leds/vibrator/vmax_mv
 
 on property:sys.button_backlight.on=true
     write /sys/class/leds/button-backlight/brightness 255

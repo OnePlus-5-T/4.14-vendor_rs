@@ -28,8 +28,7 @@ LOCAL_STATIC_ANDROID_LIBRARIES := \
 
 LOCAL_OVERRIDES_PACKAGES := \
     OnePlusDoze \
-    uceShimService \
-    vendor.qti.hardware.vibrator.service
+    uceShimService
 
 LOCAL_PACKAGE_NAME := SettingsExtra
 

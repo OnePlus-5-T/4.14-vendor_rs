@@ -197,26 +197,28 @@ public final class Utils {
     }
 
     protected static void setVibrationIntensity(String value, Context context){
-        int max = 3596;
-        int min = 116;
+        int max = 0;
+        int min = 1;
+        if (Utils.getProp("ro.build.product").equals("cheeseburger")) {
+                max = 2088;
+        }
+        else {
+                max = 1800;
+        }
         int f_value = (max / 100) * Integer.valueOf(value);
         if (f_value < min) f_value = min + 1;
         if (DEBUG) Log.d (TAG, "vibration intensity: " + f_value);
         try {
-                writeToFile("/sys/devices/virtual/timed_output/vibrator/vtg_level", String.valueOf(f_value), context);
+                writeToFile("/sys/class/leds/vibrator/vmax_mv", String.valueOf(f_value), context);
         } catch (Exception e) {
-                if (DEBUG) Log.d(TAG, "This is not Lazy kernel!");
-        }
-        try {
-                writeToFile("/sys/devices/virtual/timed_output/vibrator/vmax_mv", String.valueOf(f_value), context);
-        } catch (Exception e) {
-                if (DEBUG) Log.d(TAG, "This is not Lineage kernel!");
+                if (DEBUG) Log.d(TAG, "Error writing the vmax_mv file!");
         }
     }
 
     protected static void vibrate(int vibrationLength, Context context) {
         try {
-            writeToFile("/sys/devices/virtual/timed_output/vibrator/enable", String.valueOf(vibrationLength), context);
+            writeToFile("/sys/class/leds/vibrator/duration", String.valueOf(vibrationLength), context);
+            writeToFile("/sys/class/leds/vibrator/activate", "1", context);
         } catch (Exception e) {
             if (DEBUG) Log.d(TAG, "Cannot start vibration!");
         }
