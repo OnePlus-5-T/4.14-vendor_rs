@@ -5,8 +5,7 @@ name := $(TARGET_PRODUCT)
 ifeq ($(TARGET_BUILD_TYPE),debug)
 	  name := $(name)_debug
 endif
-target_files_name := $(name)-target_files-$(FILE_NAME_TAG)
-ota_name := $(name)-ota-$(FILE_NAME_TAG)
+target_files_name := $(name)-target_files
 target_files_zip_root := $(intermediates)/$(target_files_name)
 
 INTERNAL_OTA_PACKAGE_TARGET_CUSTOM := $(PRODUCT_OUT)/$(name)-ota.zip
