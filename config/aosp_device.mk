@@ -79,7 +79,8 @@ PRODUCT_VENDOR_KERNEL_HEADERS := vendor/rs/kernel-headers
 PRODUCT_SOONG_NAMESPACES += \
     vendor/qcom/opensource/data-ipa-cfg-mgr \
     vendor/qcom/opensource/dataservices \
-    vendor/rs/config
+    vendor/rs/config \
+    hardware/qcom/wlan/legacy
 
 # Camera API1 ZSL
 PRODUCT_PROPERTY_OVERRIDES += \
