@@ -29,6 +29,10 @@ PRODUCT_COPY_FILES += \
     vendor/rs/config/recovery/root/init.recovery.qcom.rc:root/init.recovery.qcom.rc \
     vendor/rs/config/recovery/root/init.recovery.qcom.usb.rc:root/init.recovery.qcom.usb.rc
 
+# VNDK
+PRODUCT_COPY_FILES += \
+    prebuilts/vndk/v29/arm64/arch-arm64-armv8-a/shared/vndk-core/libprotobuf-cpp-lite.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libprotobuf-cpp-lite.so
+
 include device/lineage/sepolicy/common/sepolicy.mk
 BOARD_SEPOLICY_DIRS += vendor/rs/sepolicy
 
