@@ -61,6 +61,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     lineage_charger_animation
 
+# Workaround for prebuilt Qualcomm neural network HAL
+PRODUCT_PACKAGES += \
+    libprotobuf-cpp-full-3.9.1-vendorcompat
+
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     SystemUI
