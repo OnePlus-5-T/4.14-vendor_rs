@@ -87,6 +87,8 @@ struct in_addr {
 };
 #endif
 
+typedef uint32_t in_addr_t;
+
 #define IP_TOS		1
 #define IP_TTL		2
 #define IP_HDRINCL	3
@@ -300,6 +302,5 @@ struct sockaddr_in {
 /* <asm/byteorder.h> contains the htonl type stuff.. */
 #include <asm/byteorder.h> 
 
-typedef uint32_t in_addr_t;
 
 #endif /* _LINUX_IN_H */
