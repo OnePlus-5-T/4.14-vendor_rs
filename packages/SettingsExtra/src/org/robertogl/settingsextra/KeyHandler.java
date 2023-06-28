@@ -112,14 +112,8 @@ public class KeyHandler extends Service {
                 vibrator.vibrate(
                         MODE_VIBRATION_EFFECT,
                         HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES
-            );
+                );
                 break;
-            /*case AudioManager.RINGER_MODE_NORMAL:
-                vibrator.vibrate(
-                        MODE_NORMAL_EFFECT,
-                        HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES
-            );
-            break;*/
         }
     }
 
@@ -144,7 +138,6 @@ public class KeyHandler extends Service {
         executorService.submit(() -> {
         switch (mode) {
             case AudioManager.RINGER_MODE_SILENT:
-                setZenMode(Settings.Global.ZEN_MODE_OFF);
                 audioManager.setRingerModeInternal(mode);
                 if (muteMedia) {
                     audioManager.adjustVolume(AudioManager.ADJUST_MUTE, 0);
@@ -153,17 +146,7 @@ public class KeyHandler extends Service {
                 break;
             case AudioManager.RINGER_MODE_VIBRATE:
             case AudioManager.RINGER_MODE_NORMAL:
-                setZenMode(Settings.Global.ZEN_MODE_OFF);
                 audioManager.setRingerModeInternal(mode);
-                if (muteMedia && wasMuted) {
-                    audioManager.adjustVolume(AudioManager.ADJUST_UNMUTE, 0);
-                }
-                break;
-            case ZEN_PRIORITY_ONLY:
-            case ZEN_TOTAL_SILENCE:
-            case ZEN_ALARMS_ONLY:
-                audioManager.setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
-                setZenMode(mode - ZEN_OFFSET);
                 if (muteMedia && wasMuted) {
                     audioManager.adjustVolume(AudioManager.ADJUST_UNMUTE, 0);
                 }
@@ -172,21 +155,6 @@ public class KeyHandler extends Service {
         vibrateIfNeeded(mode);
     });
     }
-
-    private void setZenMode(int zenMode) {
-        // Set zen mode
-        notificationManager.setZenMode(zenMode, null, TAG);
-
-        // Wait until zen mode change is committed
-        while (notificationManager.getZenMode() != zenMode) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private static final String TAG = "KeyHandler";
 
     // Slider key positions
@@ -199,12 +167,6 @@ public class KeyHandler extends Service {
     private static final String ALERT_SLIDER_MIDDLE_KEY = "config_middle_position";
     private static final String ALERT_SLIDER_BOTTOM_KEY = "config_bottom_position";
     private static final String MUTE_MEDIA_WITH_SILENT = "config_mute_media";
-
-    // ZEN constants
-    private static final int ZEN_OFFSET = 2;
-    private static final int ZEN_PRIORITY_ONLY = 3;
-    private static final int ZEN_TOTAL_SILENCE = 4;
-    private static final int ZEN_ALARMS_ONLY = 5;
 
     // Vibration attributes
     private static final VibrationAttributes HARDWARE_FEEDBACK_VIBRATION_ATTRIBUTES =
