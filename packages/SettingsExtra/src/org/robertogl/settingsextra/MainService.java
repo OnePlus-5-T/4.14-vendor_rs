@@ -368,6 +368,8 @@ public class MainService extends AccessibilityService {
 
         Utils.manageNavBar(mContext);
 
+        // Start KeyHandler
+        startService(new Intent(this, KeyHandler.class));
     }
 
     private final SubscriptionManager.OnSubscriptionsChangedListener mSubscriptionsChangedListener = new SubscriptionManager.OnSubscriptionsChangedListener() {

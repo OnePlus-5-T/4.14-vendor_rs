@@ -95,6 +95,12 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".KeyHandler"
+            android:enabled="true"
+            android:label="KeyHandler">
+        </service>
+
         <activity
             android:name=".TilePreference"
             android:excludeFromRecents="true"
