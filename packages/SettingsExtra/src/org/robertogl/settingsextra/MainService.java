@@ -58,8 +58,6 @@ public class MainService extends AccessibilityService {
     private static final int msDoubleClickThreshold = 250;
     private long msDoubleClick = 0;
 
-    private static final String TriStatePath = "/sys/devices/virtual/switch/tri-state-key/state";
-
     private static int clickToShutdown = 0;
 
     private Context mContext;
@@ -261,25 +259,6 @@ public class MainService extends AccessibilityService {
         SharedPreferences pref = deviceProtectedContext.getSharedPreferences(mContext.getPackageName() + "_preferences", MODE_PRIVATE);
 
         pref.registerOnSharedPreferenceChangeListener(mPreferenceListener);
-
-        // Set the status at boot following the slider position
-        // Do this in case the user changes the slider position while the phone is off, for example
-        // Also, we solve an issue regarding the STREAM_MUSIC that was never mute at boot
-        int tristate = Integer.parseInt(Utils.readFromFile(TriStatePath));
-        if (DEBUG) Log.d(TAG, "Tri Key state: " + tristate);
-        if (tristate == 1) {
-            // Silent mode
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
-            mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_SILENT);
-        } else if (tristate == 2) {
-            // Vibration mode
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
-            mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_VIBRATE);
-        } else if (tristate == 3) {
-            // Normal mode
-            mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
-            mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
-        }
 
         // Register here to get the SCREEN_OFF event
         // Used to turn off the capacitive buttons backlight

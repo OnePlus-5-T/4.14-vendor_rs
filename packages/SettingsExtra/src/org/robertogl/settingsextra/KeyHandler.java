@@ -36,6 +36,9 @@ public class KeyHandler extends Service {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private boolean wasMuted = false;
+
+    private static final String TriStatePath = "/sys/devices/virtual/switch/tri-state-key/state";
+
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -86,6 +89,25 @@ public class KeyHandler extends Service {
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         Context deviceProtectedContext = createDeviceProtectedStorageContext();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(deviceProtectedContext);
+
+        // Set the status at boot following the slider position
+        // Do this in case the user changes the slider position while the phone is off, for example
+        // Also, we solve an issue regarding the media volume that was never mute at boot
+        int tristate = Integer.parseInt(Utils.readFromFile(TriStatePath));
+        switch (tristate) {
+            case POSITION_TOP:
+                audioManager.adjustVolume(AudioManager.ADJUST_MUTE, 0);
+                audioManager.setRingerModeInternal(AudioManager.RINGER_MODE_SILENT);
+                break;
+            case POSITION_MIDDLE:
+                audioManager.adjustVolume(AudioManager.ADJUST_UNMUTE, 0);
+                audioManager.setRingerModeInternal(AudioManager.RINGER_MODE_VIBRATE);
+                break;
+            case POSITION_BOTTOM:
+                audioManager.adjustVolume(AudioManager.ADJUST_UNMUTE, 0);
+                audioManager.setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
+                break;
+        }
 
         registerReceiver(
                 broadcastReceiver,
