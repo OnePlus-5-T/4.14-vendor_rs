@@ -20,10 +20,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     messaging
 
-# Tri-state-key
-PRODUCT_PACKAGES += \
-    tri-state-key_daemon
-
 # Custom light HAL
 PRODUCT_PACKAGES += \
     light_daemon
