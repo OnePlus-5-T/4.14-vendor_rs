@@ -138,5 +138,20 @@ public class SettingsExtraFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
+
+        final Preference disableVoltageCheck = getPreferenceScreen().findPreference("disableChargerVoltageCheck");
+        disableVoltageCheck.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String key = preference.getKey();
+                if (DEBUG) Log.d(TAG, key);
+                if ((boolean) newValue)
+                    Utils.writeToFile(Utils.disableChargerVoltageCheckNode, "1", getActivity());
+                else
+                    Utils.writeToFile(Utils.disableChargerVoltageCheckNode, "0", getActivity());
+                return true;
+            }
+        });
+
     }
 }

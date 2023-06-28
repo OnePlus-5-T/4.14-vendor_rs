@@ -68,6 +68,8 @@ public final class Utils {
     protected static final String CHEESEBURGER_FP_PROXIMITY_FILE =
             "/sys/devices/soc/soc:fpc_fpc1020/proximity_state";
 
+    protected static String disableChargerVoltageCheckNode = "/sys/devices/platform/soc/800f000.qcom,spmi/spmi-0/spmi0-02/800f000.qcom,spmi:qcom,pmi8998@2:qcom,qpnp-smb2/disable_voltage_check";
+
     private static boolean isGamingModeEnabled = false;
 
     private static boolean isCapacitiveButtonsUsed = false;

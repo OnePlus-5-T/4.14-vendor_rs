@@ -81,6 +81,11 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             mNotificationManager.setNotificationListenerAccessGranted(ComponentName.unflattenFromString(LedServiceString), true);
         }
 
+        // Verify if we should disable charging check
+        boolean disableChargerCheck = pref.getBoolean("disableChargerVoltageCheck", false);
+        if (disableChargerCheck)
+            Utils.writeToFile(Utils.disableChargerVoltageCheckNode, "1", deviceProtectedContext);
+
         // Grant permissions to needed app (currently, Google apps)
         DefaultPermissionGrantPolicyExtra mDefaultPermissionGrantPolicyExtra = new DefaultPermissionGrantPolicyExtra();
         mDefaultPermissionGrantPolicyExtra.onStartup(deviceProtectedContext);
