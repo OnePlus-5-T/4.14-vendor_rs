@@ -85,12 +85,12 @@ public class KeyHandler extends Service {
         switch (mode) {
             case AudioManager.RINGER_MODE_SILENT:
                 audioManager.setRingerModeInternal(mode);
-                audioManager.adjustVolume(AudioManager.ADJUST_MUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
                 break;
             case AudioManager.RINGER_MODE_VIBRATE:
             case AudioManager.RINGER_MODE_NORMAL:
                 audioManager.setRingerModeInternal(mode);
-                audioManager.adjustVolume(AudioManager.ADJUST_UNMUTE, 0);
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
                 break;
         }
     });
