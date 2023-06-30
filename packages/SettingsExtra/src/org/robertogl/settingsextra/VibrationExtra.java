@@ -24,7 +24,7 @@ public class VibrationExtra {
         Context deviceProtectedContext = mContext.createDeviceProtectedStorageContext();
         SharedPreferences pref = deviceProtectedContext.getSharedPreferences(mContext.getPackageName() + "_preferences", MODE_PRIVATE);
 
-        String vibrationIntensityFloat = pref.getString(Utils.vibrationIntensityString, "58");
+        String vibrationIntensityFloat = pref.getString(Utils.vibrationIntensityString, "100");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle("Vibration Intensity (0 - 100)");
