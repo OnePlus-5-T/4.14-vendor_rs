@@ -324,7 +324,7 @@ public class MainService extends AccessibilityService {
         else Utils.setHeadsUpNotification("0", mContext);
 
         // Set vibration intensity
-        String vibrationIntensityFloat = pref.getString(Utils.vibrationIntensityString, "58");
+        String vibrationIntensityFloat = pref.getString(Utils.vibrationIntensityString, "100");
         Utils.setVibrationIntensity(vibrationIntensityFloat, mContext);
 
         // Get capacitive buttons backlight timeout
