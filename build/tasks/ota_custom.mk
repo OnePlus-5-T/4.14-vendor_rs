@@ -10,7 +10,7 @@ target_files_zip_root := $(intermediates)/$(target_files_name)
 
 BUILD_ROOT := $(shell pwd)
 
-INTERNAL_OTA_PACKAGE_TARGET_CUSTOM := $(PRODUCT_OUT)/$(name)-ota.zip
+INTERNAL_OTA_PACKAGE_TARGET_CUSTOM := $(PRODUCT_OUT)/$(name)-ota-custom.zip
 INTERNAL_OTA_METADATA_CUSTOM := $(PRODUCT_OUT)/ota_metadata_custom
 
 $(INTERNAL_OTA_PACKAGE_TARGET_CUSTOM): KEY_CERT_PAIR := $(DEFAULT_KEY_CERT_PAIR)
