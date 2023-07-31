@@ -8,6 +8,8 @@ endif
 target_files_name := $(name)-target_files
 target_files_zip_root := $(intermediates)/$(target_files_name)
 
+BUILD_ROOT := $(shell pwd)
+
 INTERNAL_OTA_PACKAGE_TARGET_CUSTOM := $(PRODUCT_OUT)/$(name)-ota.zip
 INTERNAL_OTA_METADATA_CUSTOM := $(PRODUCT_OUT)/ota_metadata_custom
 
@@ -31,7 +33,8 @@ $(INTERNAL_OTA_PACKAGE_TARGET_CUSTOM): $(BUILT_TARGET_FILES_PACKAGE) $(OTA_FROM_
 	$(hide) unzip -o $@ -d $(target_files_zip_root)/OTA_TMP 'META-INF/com/google/android/updater-script'
 	$(hide) sed -i 1d $(target_files_zip_root)/OTA_TMP/META-INF/com/google/android/updater-script
 	$(hide) mv $@ $(target_files_zip_root)/OTA_TMP/tmp.zip
-	$(hide) cd $(target_files_zip_root)/OTA_TMP && zip -q -u -r tmp.zip 'META-INF/com/google/android/updater-script'
+	$(hide) cp $(BUILD_ROOT)/vendor/rs/binary/update-binary $(target_files_zip_root)/OTA_TMP/META-INF/com/google/android/update-binary
+	$(hide) cd $(target_files_zip_root)/OTA_TMP && zip -q -u -r tmp.zip 'META-INF/com/google/android/updater-script' && zip -q -u -r tmp.zip 'META-INF/com/google/android/update-binary'
 	$(hide) java -jar -Djava.library.path="out/host/linux-x86/lib64" $(HOST_OUT_EXECUTABLES)/../framework/signapk.jar -w vendor/rs/config/security/releasekey.x509.pem vendor/rs/config/security/releasekey.pk8 $(target_files_zip_root)/OTA_TMP/tmp.zip $@
 	$(hide) rm -rf $(target_files_zip_root)/OTA_TMP
 
