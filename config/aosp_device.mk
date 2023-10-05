@@ -10,7 +10,6 @@ PRODUCT_PACKAGES += \
 # Theme picker
 PRODUCT_PACKAGES += \
     ThemePicker \
-    ThemeStub \
     ThemesStub
 
 # Theme overlays
