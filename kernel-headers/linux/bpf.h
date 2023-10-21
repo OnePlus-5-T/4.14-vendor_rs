@@ -93,6 +93,8 @@ enum bpf_cmd {
 	BPF_PROG_GET_FD_BY_ID,
 	BPF_MAP_GET_FD_BY_ID,
 	BPF_OBJ_GET_INFO_BY_FD,
+	BPF_PROG_QUERY,
+	BPF_RAW_TRACEPOINT_OPEN,
 };
 
 enum bpf_map_type {
@@ -130,6 +132,10 @@ enum bpf_prog_type {
 	BPF_PROG_TYPE_LWT_XMIT,
 	BPF_PROG_TYPE_SOCK_OPS,
 	BPF_PROG_TYPE_SK_SKB,
+	BPF_PROG_TYPE_CGROUP_DEVICE,
+	BPF_PROG_TYPE_SK_MSG,
+	BPF_PROG_TYPE_RAW_TRACEPOINT,
+	BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
 };
 
 enum bpf_attach_type {
@@ -139,16 +145,61 @@ enum bpf_attach_type {
 	BPF_CGROUP_SOCK_OPS,
 	BPF_SK_SKB_STREAM_PARSER,
 	BPF_SK_SKB_STREAM_VERDICT,
+	BPF_CGROUP_DEVICE,
+	BPF_SK_MSG_VERDICT,
+	BPF_CGROUP_INET4_BIND,
+	BPF_CGROUP_INET6_BIND,
+	BPF_CGROUP_INET4_CONNECT,
+	BPF_CGROUP_INET6_CONNECT,
+	BPF_CGROUP_INET4_POST_BIND,
+	BPF_CGROUP_INET6_POST_BIND,
 	__MAX_BPF_ATTACH_TYPE
 };
 
 #define MAX_BPF_ATTACH_TYPE __MAX_BPF_ATTACH_TYPE
 
-/* If BPF_F_ALLOW_OVERRIDE flag is used in BPF_PROG_ATTACH command
- * to the given target_fd cgroup the descendent cgroup will be able to
- * override effective bpf program that was inherited from this cgroup
- */
+/* cgroup-bpf attach flags used in BPF_PROG_ATTACH command
+ *
+ * NONE(default): No further bpf programs allowed in the subtree.
+ *
+ * BPF_F_ALLOW_OVERRIDE: If a sub-cgroup installs some bpf program,
+ * the program in this cgroup yields to sub-cgroup program.
+ *
+ * BPF_F_ALLOW_MULTI: If a sub-cgroup installs some bpf program,
+ * that cgroup program gets run in addition to the program in this cgroup.
+ *
+ * Only one program is allowed to be attached to a cgroup with
+ * NONE or BPF_F_ALLOW_OVERRIDE flag.
+ * Attaching another program on top of NONE or BPF_F_ALLOW_OVERRIDE will
+ * release old program and attach the new one. Attach flags has to match.
+ *
+ * Multiple programs are allowed to be attached to a cgroup with
+ * BPF_F_ALLOW_MULTI flag. They are executed in FIFO order
+ * (those that were attached first, run first)
+ * The programs of sub-cgroup are executed first, then programs of
+ * this cgroup and then programs of parent cgroup.
+ * When children program makes decision (like picking TCP CA or sock bind)
+ * parent program has a chance to override it.
+ *
+ * A cgroup with MULTI or OVERRIDE flag allows any attach flags in sub-cgroups.
+ * A cgroup with NONE doesn't allow any programs in sub-cgroups.
+ * Ex1:
+ * cgrp1 (MULTI progs A, B) ->
+ *    cgrp2 (OVERRIDE prog C) ->
+ *      cgrp3 (MULTI prog D) ->
+ *        cgrp4 (OVERRIDE prog E) ->
+ *          cgrp5 (NONE prog F)
+ * the event in cgrp5 triggers execution of F,D,A,B in that order.
+ * if prog F is detached, the execution is E,D,A,B
+ * if prog F and D are detached, the execution is E,A,B
+ * if prog F, E and D are detached, the execution is C,A,B
+*
+ * All eligible programs are executed regardless of return code from
+ * earlier programs.
+  */
+
 #define BPF_F_ALLOW_OVERRIDE	(1U << 0)
+#define BPF_F_ALLOW_MULTI      (1U << 1)
 
 /* If BPF_F_STRICT_ALIGNMENT is used in BPF_PROG_LOAD command, the
  * verifier will perform strict alignment checking as if the kernel
@@ -176,6 +227,11 @@ enum bpf_attach_type {
 /* Specify numa node during map creation */
 #define BPF_F_NUMA_NODE		(1U << 2)
 
+/* flags for BPF_PROG_QUERY */
+#define BPF_F_QUERY_EFFECTIVE  (1U << 0)
+
+#define BPF_OBJ_NAME_LEN 16U
+
 /* Flags for accessing BPF object */
 #define BPF_F_RDONLY		(1U << 3)
 #define BPF_F_WRONLY		(1U << 4)
@@ -193,6 +249,7 @@ union bpf_attr {
 		__u32	numa_node;	/* numa node (effective only if
 					 * BPF_F_NUMA_NODE is set).
 					 */
+		char    map_name[BPF_OBJ_NAME_LEN];
 	};
 
 	struct { /* anonymous struct used by BPF_MAP_*_ELEM commands */
@@ -215,6 +272,13 @@ union bpf_attr {
 		__aligned_u64	log_buf;	/* user supplied buffer */
 		__u32		kern_version;	/* checked when prog_type=kprobe */
 		__u32		prog_flags;
+		char            prog_name[BPF_OBJ_NAME_LEN];
+		__u32           prog_target_ifindex;    /* ifindex of netdev to prep for */
+		/* For some prog types expected attach type must be known at
+		 * load time to verify attach type specific parts of prog
+		 * (context accesses, allowed helpers, etc).
+		*/
+		 __u32           expected_attach_type;
 	};
 
 	struct { /* anonymous struct used by BPF_OBJ_* commands */
@@ -256,6 +320,20 @@ union bpf_attr {
 		__u32		info_len;
 		__aligned_u64	info;
 	} info;
+
+	struct { /* anonymous struct used by BPF_PROG_QUERY command */
+		__u32           target_fd;      /* container object to query */
+		__u32           attach_type;
+		__u32           query_flags;
+		__u32           attach_flags;
+		__aligned_u64   prog_ids;
+		__u32           prog_cnt;
+	} query;
+
+	struct {
+		__u64 name;
+		__u32 prog_fd;
+	} raw_tracepoint;
 } __attribute__((aligned(8)));
 
 /* BPF helper function descriptions:
@@ -589,6 +667,35 @@ union bpf_attr {
  *	@map: pointer to sockmap to update
  *	@key: key to insert/update sock in map
  *	@flags: same flags as map update elem
+ *
+ * int skb_load_bytes_relative(const struct sk_buff *skb, u32 offset, void *to, u32 len, u32 start_header)
+ *     Description
+ *             This helper is similar to **bpf_skb_load_bytes**\ () in that
+ *             it provides an easy way to load *len* bytes from *offset*
+ *             from the packet associated to *skb*, into the buffer pointed
+ *             by *to*. The difference to **bpf_skb_load_bytes**\ () is that
+ *             a fifth argument *start_header* exists in order to select a
+ *             base offset to start from. *start_header* can be one of:
+ *
+ *             **BPF_HDR_START_MAC**
+ *                     Base offset to load data from is *skb*'s mac header.
+ *             **BPF_HDR_START_NET**
+ *                     Base offset to load data from is *skb*'s network header.
+ *
+ *             In general, "direct packet access" is the preferred method to
+ *             access packet data, however, this helper is in particular useful
+ *             in socket filters where *skb*\ **->data** does not always point
+ *             to the start of the mac header and where "direct packet access"
+ *             is not available.
+ *
+ * int bpf_bind(ctx, addr, addr_len)
+ *     Bind socket to address. Only binding to IP is supported, no port can be
+ *     set in addr.
+ *     @ctx: pointer to context of type bpf_sock_addr
+ *     @addr: pointer to struct sockaddr to bind socket to
+ *     @addr_len: length of sockaddr structure
+ *     Return: 0 on success or negative error code
+ *
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -645,6 +752,80 @@ union bpf_attr {
 	FN(redirect_map),		\
 	FN(sk_redirect_map),		\
 	FN(sock_map_update),		\
+	/* tbi is 'to be implemented */ 		\
+	/* when support is added to a function, remove the 'tbi' */ \
+	FN(xdp_adjust_meta), /* tbi*/   	\
+	FN(perf_event_read_value), /* tbi*/     \
+	FN(perf_prog_read_value), /* tbi*/      \
+	FN(getsockopt), /* tbi*/                \
+	FN(override_return), /* tbi*/           \
+	FN(sock_ops_cb_flags_set), /* tbi*/     \
+	FN(msg_redirect_map), /* tbi*/          \
+	FN(msg_apply_bytes), /* tbi*/           \
+	FN(msg_cork_bytes), /* tbi*/            \
+	FN(msg_pull_data), /* tbi*/             \
+	FN(bind),                               \
+	FN(xdp_adjust_tail), /* tbi*/           \
+	FN(skb_get_xfrm_state), /* tbi*/        \
+	FN(get_stack), /* tbi*/                 \
+	FN(skb_load_bytes_relative),		\
+	FN(fib_lookup), /* tbi*/                \
+	FN(sock_hash_update), /* tbi*/          \
+	FN(msg_redirect_hash), /* tbi*/         \
+	FN(sk_redirect_hash), /* tbi*/          \
+	FN(lwt_push_encap), /* tbi*/            \
+	FN(lwt_seg6_store_bytes), /* tbi*/      \
+	FN(lwt_seg6_adjust_srh), /* tbi*/       \
+	FN(lwt_seg6_action), /* tbi*/           \
+	FN(rc_repeat), /* tbi*/                 \
+	FN(rc_keydown), /* tbi*/                \
+	FN(skb_cgroup_id), /* tbi*/             \
+	FN(get_current_cgroup_id), /* tbi*/     \
+	FN(get_local_storage), /* tbi*/         \
+	FN(sk_select_reuseport), /* tbi*/       \
+	FN(skb_ancestor_cgroup_id), /* tbi*/    \
+	FN(sk_lookup_tcp), /* tbi*/             \
+	FN(sk_lookup_udp), /* tbi*/             \
+	FN(sk_release), /* tbi*/                \
+	FN(map_push_elem), /* tbi*/             \
+	FN(map_pop_elem), /* tbi*/              \
+	FN(map_peek_elem), /* tbi*/             \
+	FN(msg_push_data), /* tbi*/             \
+	FN(msg_pop_data), /* tbi*/              \
+	FN(rc_pointer_rel), /* tbi*/            \
+	FN(spin_lock), /* tbi*/                 \
+	FN(spin_unlock), /* tbi*/               \
+	FN(sk_fullsock), /* tbi*/               \
+	FN(tcp_sock), /* tbi*/                  \
+	FN(skb_ecn_set_ce), /* tbi*/            \
+	FN(get_listener_sock), /* tbi*/         \
+	FN(skc_lookup_tcp), /* tbi*/            \
+	FN(tcp_check_syncookie), /* tbi*/       \
+	FN(sysctl_get_name), /* tbi*/           \
+	FN(sysctl_get_current_value), /* tbi*/  \
+	FN(sysctl_get_new_value), /* tbi*/      \
+	FN(sysctl_set_new_value), /* tbi*/      \
+	FN(strtol), /* tbi*/                    \
+	FN(strtoul), /* tbi*/                   \
+	FN(sk_storage_get), /* tbi*/            \
+	FN(sk_storage_delete), /* tbi*/         \
+	FN(send_signal), /* tbi*/               \
+	FN(tcp_gen_syncookie), /* tbi*/         \
+	FN(skb_output), /* tbi*/                \
+	FN(probe_read_user),   /* tbi*/         \
+	FN(probe_read_kernel), /* tbi*/         \
+	FN(probe_read_user_str), /* tbi*/       \
+	FN(probe_read_kernel_str), /* tbi*/     \
+	FN(tcp_send_ack), /* tbi*/              \
+	FN(send_signal_thread), /* tbi*/        \
+	FN(jiffies64), /* tbi*/                 \
+	FN(read_branch_records), /* tbi*/       \
+	FN(get_ns_current_pid_tgid), /* tbi*/   \
+	FN(xdp_output), /* tbi*/                \
+	FN(get_netns_cookie), /* tbi*/          \
+	FN(get_current_ancestor_cgroup_id), /* tbi*/    \
+	FN(sk_assign), /* tbi*/                 \
+	FN(ktime_get_boot_ns),
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper
  * function eBPF program intends to call
@@ -697,6 +878,12 @@ enum bpf_func_id {
 /* Mode for BPF_FUNC_skb_adjust_room helper. */
 enum bpf_adj_room_mode {
 	BPF_ADJ_ROOM_NET,
+};
+
+/* Mode for BPF_FUNC_skb_load_bytes_relative helper. */
+enum bpf_hdr_start_off {
+BPF_HDR_START_MAC,
+BPF_HDR_START_NET,
 };
 
 /* user accessible mirror of in-kernel sk_buff.
@@ -767,6 +954,15 @@ struct bpf_sock {
 	__u32 protocol;
 	__u32 mark;
 	__u32 priority;
+	__u32 src_ip4;          /* Allows 1,2,4-byte read.
+				* Stored in network byte order.
+				*/
+	__u32 src_ip6[4];       /* Allows 1,2,4-byte read.
+				* Stored in network byte order.
+				*/
+	__u32 src_port;         /* Allows 4-byte read.
+				* Stored in host byte order
+				*/
 };
 
 #define XDP_PACKET_HEADROOM 256
@@ -797,6 +993,14 @@ enum sk_action {
 	SK_PASS,
 };
 
+/* user accessible metadata for SK_MSG packet hook, new fields must
+ * be added to the end of this structure
+ */
+struct sk_msg_md {
+	void *data;
+	void *data_end;
+};
+
 #define BPF_TAG_SIZE	8
 
 struct bpf_prog_info {
@@ -807,6 +1011,11 @@ struct bpf_prog_info {
 	__u32 xlated_prog_len;
 	__aligned_u64 jited_prog_insns;
 	__aligned_u64 xlated_prog_insns;
+	__u64 load_time;        /* ns since boottime */
+	__u32 created_by_uid;
+	__u32 nr_map_ids;
+	__aligned_u64 map_ids;
+	char  name[BPF_OBJ_NAME_LEN];
 } __attribute__((aligned(8)));
 
 struct bpf_map_info {
@@ -816,7 +1025,28 @@ struct bpf_map_info {
 	__u32 value_size;
 	__u32 max_entries;
 	__u32 map_flags;
+	char  name[BPF_OBJ_NAME_LEN];
 } __attribute__((aligned(8)));
+
+/* User bpf_sock_addr struct to access socket fields and sockaddr struct passed
+ * by user and intended to be used by socket (e.g. to bind to, depends on
+ * attach attach type).
+ */
+struct bpf_sock_addr {
+	__u32 user_family;      /* Allows 4-byte read, but no write. */
+	__u32 user_ip4;         /* Allows 1,2,4-byte read and 4-byte write.
+				* Stored in network byte order.
+				*/
+	__u32 user_ip6[4];      /* Allows 1,2,4-byte read an 4-byte write.
+				* Stored in network byte order.
+				*/
+	__u32 user_port;        /* Allows 4-byte read and write.
+				* Stored in network byte order
+				*/
+	__u32 family;           /* Allows 4-byte read, but no write */
+	__u32 type;             /* Allows 4-byte read, but no write */
+	__u32 protocol;         /* Allows 4-byte read, but no write */
+};
 
 /* User bpf_sock_ops struct to access socket values and specify request ops
  * and their replies.
@@ -869,5 +1099,22 @@ enum {
 
 #define TCP_BPF_IW		1001	/* Set TCP initial congestion window */
 #define TCP_BPF_SNDCWND_CLAMP	1002	/* Set sndcwnd_clamp */
+
+#define BPF_DEVCG_ACC_MKNOD    (1ULL << 0)
+#define BPF_DEVCG_ACC_READ     (1ULL << 1)
+#define BPF_DEVCG_ACC_WRITE    (1ULL << 2)
+
+#define BPF_DEVCG_DEV_BLOCK    (1ULL << 0)
+#define BPF_DEVCG_DEV_CHAR     (1ULL << 1)
+
+struct bpf_cgroup_dev_ctx {
+	__u32 access_type; /* (access << 16) | type */
+	__u32 major;
+	__u32 minor;
+};
+
+struct bpf_raw_tracepoint_args {
+	__u64 args[0];
+};
 
 #endif /* __LINUX_BPF_H__ */
