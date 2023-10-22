@@ -8,6 +8,17 @@ endif
 target_files_name := $(name)-target_files
 target_files_zip_root := $(intermediates)/$(target_files_name)
 
+define build-ota-package-target-custom
+PATH=$(INTERNAL_USERIMAGES_BINARY_PATHS):$(dir $(ZIP2ZIP)):$$PATH \
+    $(OTA_FROM_TARGET_FILES) \
+        --verbose \
+        --extracted_input_target_files $(4) \
+        --path $(HOST_OUT) \
+        $(if $(OEM_OTA_CONFIG), --oem_settings $(OEM_OTA_CONFIG)) \
+        $(2) \
+        $(3) $(1)
+endef
+
 BUILD_ROOT := $(shell pwd)
 
 INTERNAL_OTA_PACKAGE_TARGET_CUSTOM := $(PRODUCT_OUT)/$(name)-ota-custom.zip
@@ -28,7 +39,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET_CUSTOM): $(BUILT_TARGET_FILES_PACKAGE) $(OTA_FROM_
 	$(hide) zip -q -d $(BUILT_TARGET_FILES_PACKAGE) 'IMAGES/*'
 	$(hide) $(ADD_IMG_TO_TARGET_FILES) -a $(BUILT_TARGET_FILES_PACKAGE)
 	$(hide) unzip -o -j $(BUILT_TARGET_FILES_PACKAGE) -d $(target_files_zip_root)/IMAGES 'IMAGES/*'
-	$(call build-ota-package-target,$@,-k $(KEY_CERT_PAIR) --output_metadata_path $(INTERNAL_OTA_METADATA_CUSTOM))
+	$(call build-ota-package-target-custom,$@,-k $(KEY_CERT_PAIR) --output_metadata_path $(INTERNAL_OTA_METADATA_CUSTOM), $(BUILT_TARGET_FILES_PACKAGE), $(target_files_zip_root))
 	$(hide) mkdir -p $(target_files_zip_root)/OTA_TMP
 	$(hide) unzip -o $@ -d $(target_files_zip_root)/OTA_TMP 'META-INF/com/google/android/updater-script'
 	$(hide) sed -i 1d $(target_files_zip_root)/OTA_TMP/META-INF/com/google/android/updater-script
