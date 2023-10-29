@@ -12,3 +12,6 @@ pm.boot.disable_package_cache=1
 
 # Radio
 persist.sys.fflag.override.settings_provider_model=false
+
+# SELinux status
+ro.build.selinux=1
