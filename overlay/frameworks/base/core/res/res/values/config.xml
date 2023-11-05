@@ -72,4 +72,7 @@
     </integer-array>
 
     <string name="config_displayLightSensorType">android.sensor.light</string>
+
+    <!-- If this is true, the screen will come on when you unplug usb/power/whatever. -->
+    <bool name="config_unplugTurnsOnScreen">true</bool>
 </resources>
