@@ -41,3 +41,6 @@ TARGET_USES_INTERACTION_BOOST := true
 
 # Disable extended compress format
 AUDIO_FEATURE_ENABLED_EXTENDED_COMPRESS_FORMAT := false
+
+# Keep VNDK
+KEEP_VNDK := true
