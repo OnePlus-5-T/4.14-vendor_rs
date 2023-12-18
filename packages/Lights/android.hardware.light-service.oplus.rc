@@ -22,6 +22,13 @@ on early-boot
     chown system system /sys/class/leds/lcd-backlight/brightness
     chown system system /sys/class/backlight/panel0-backlight/brightness
 
+    write /sys/class/leds/blue/brightness 1
+    write /sys/class/leds/blue/brightness 0
+    write /sys/class/leds/green/brightness 1
+    write /sys/class/leds/green/brightness 0
+    write /sys/class/leds/red/brightness 1
+    write /sys/class/leds/red/brightness 0
+
 service vendor.light-default /vendor/bin/hw/android.hardware.light-service.oplus
     class hal
     user system
