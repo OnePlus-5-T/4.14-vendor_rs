@@ -46,7 +46,7 @@ public class NfcTile extends TileService {
 
         while (mNfcAdapter == null) {
             try {
-                mNfcAdapter = NfcAdapter.getNfcAdapter(this);
+                mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
                 break;
             } catch (UnsupportedOperationException e) {
                 i++;
