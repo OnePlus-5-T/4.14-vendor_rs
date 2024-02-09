@@ -10,6 +10,9 @@
 #include "LED.h"
 #include "Utils.h"
 
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
+
 namespace aidl {
 namespace android {
 namespace hardware {
@@ -93,6 +96,12 @@ void Lights::setLED(const HwLightState& state) {
     bool rc = true;
     argb_t color = colorToArgb(state.color);
     uint32_t blink = (state.flashOnMs != 0 && state.flashOffMs != 0);
+
+    char value[1] = {0};
+    int len = __system_property_get("persist.sys.disable.rgb", value);
+    if (len > 0) {
+        return;
+    }
 
     switch (state.flashMode) {
         case FlashMode::HARDWARE:
