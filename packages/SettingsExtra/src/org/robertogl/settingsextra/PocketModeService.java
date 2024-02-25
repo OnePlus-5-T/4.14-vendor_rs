@@ -50,11 +50,20 @@ public class PocketModeService implements SensorEventListener {
     private Sensor mSensor;
     private Context mContext;
 
+    protected static Sensor getSensor(SensorManager sm, String type) {
+        for (Sensor sensor : sm.getSensorList(Sensor.TYPE_ALL)) {
+            if (type.equals(sensor.getStringType())) {
+                return sensor;
+            }
+        }
+        return null;
+    }
+
     public void ProximitySensor(Context context) {
         boolean found = false;
         mContext = context;
         mSensorManager = mContext.getSystemService(SensorManager.class);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        mSensor = getSensor(mSensorManager, "com.oneplus.sensor.pocket");
 
         if (fileExists(CHEESEBURGER_FILE)) {
             FPC_FILE = CHEESEBURGER_FILE;
@@ -74,8 +83,8 @@ public class PocketModeService implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (DEBUG) Log.d(TAG, "onSensorChanged");
-        setFPProximityState(event.values[0] < mSensor.getMaximumRange());
+        if (DEBUG) Log.d(TAG, "onSensorChanged, new value: " + event.values[0]);
+        setFPProximityState(event.values[0] == 1.0);
     }
 
     @Override
