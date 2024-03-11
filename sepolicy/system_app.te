@@ -7,7 +7,7 @@ allow system_app sysfs_vibrator:file { getattr open write };
 
 allow system_app sysfs_leds:dir search;
 
-allow system_app qemu_hw_prop:file { getattr open read };
+allow system_app qemu_hw_prop:file { getattr open read map };
 
 allow system_app sysfs_proximity:file { open getattr write };
 
