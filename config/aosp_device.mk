@@ -66,6 +66,10 @@ PRODUCT_PACKAGES += \
     libhidlmemory.vendor \
     libsqlite.vendor
 
+# Open Camera
+PRODUCT_PACKAGES += \
+    OpenCamera
+
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     SystemUI
