@@ -60,6 +60,12 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-3.9.1-vendorcompat
 
+# Vendor dependencies
+PRODUCT_PACKAGES += \
+    libpower.vendor \
+    libhidlmemory.vendor \
+    libsqlite.vendor
+
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     SystemUI
