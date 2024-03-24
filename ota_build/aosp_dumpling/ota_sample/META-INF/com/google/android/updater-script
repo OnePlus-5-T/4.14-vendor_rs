@@ -1,0 +1,15 @@
+getprop("ro.product.device") == "dumpling" || abort("E3004: This package is for \"dumpling\" devices; this is a \"" + getprop("ro.product.device") + "\".");
+assert(oneplus.file_exists("/dev/block/bootdevice/by-name/vendor") == "1" ||     abort("Error: Vendor partition doesn't exist!"););
+assert(oneplus.verify_modem("2020-10-29 21:14:55") == "1" ||         abort("Error: This package requires firmware version 10.0.1 or newer. Please upgrade firmware and retry!"););
+ui_print("Target: OnePlus/OnePlus5/OnePlus5:8.1.0/OPM1.171019.011/04110400:user/release-keys");
+ui_print("Patching system image unconditionally...");
+show_progress(0.800000, 0);
+block_image_update("/dev/block/bootdevice/by-name/system", package_extract_file("system.transfer.list"), "system.new.dat.br", "system.patch.dat") ||
+  abort("E1001: Failed to update system image.");
+ui_print("Patching vendor image unconditionally...");
+show_progress(0.100000, 0);
+block_image_update("/dev/block/bootdevice/by-name/vendor", package_extract_file("vendor.transfer.list"), "vendor.new.dat.br", "vendor.patch.dat") ||
+  abort("E2001: Failed to update vendor image.");
+package_extract_file("boot.img", "/dev/block/bootdevice/by-name/boot");
+show_progress(0.100000, 10);
+set_progress(1.000000);
