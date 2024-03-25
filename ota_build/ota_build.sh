@@ -1,9 +1,31 @@
 #!/bin/bash
 
+if [ $# -eq 0 ] ;then
+    echo "No arguments supplied"
+    exit 1
+fi
+
+starting_dir=$PWD
+trap "cd $starting_dir; exit 1" INT
+
 # Get current cpu cores number and set it as default number of threads for make
 CPUS=$(nproc)
 
-cd $ANDROID_BUILD_TOP
+# source and lunch the product again, to start from a clean state
+# First parameter of this script should be the full parameter of the lunch command
+source build/envsetup.sh
+
+if [ $? != 0 ] ;then
+    echo "Failed to source"
+    exit 1
+fi
+
+lunch $1
+
+if [ $? != 0 ] ;then
+    echo "Failed to lunch"
+    exit 1
+fi
 
 # Start from a clean product directory
 m installclean -j$CPUS
