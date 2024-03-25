@@ -4,11 +4,11 @@ assert(oneplus.verify_modem("2020-10-29 21:14:55") == "1" ||         abort("Erro
 ui_print("Target: OnePlus/OnePlus5/OnePlus5:8.1.0/OPM1.171019.011/04110400:user/release-keys");
 ui_print("Patching system image unconditionally...");
 show_progress(0.800000, 0);
-block_image_update("/dev/block/bootdevice/by-name/system", package_extract_file("system.transfer.list"), "system.new.dat.br", "system.patch.dat") ||
+package_extract_file("system.img", "/dev/block/bootdevice/by-name/system"); ||
   abort("E1001: Failed to update system image.");
 ui_print("Patching vendor image unconditionally...");
 show_progress(0.100000, 0);
-block_image_update("/dev/block/bootdevice/by-name/vendor", package_extract_file("vendor.transfer.list"), "vendor.new.dat.br", "vendor.patch.dat") ||
+package_extract_file("vendor.img", "/dev/block/bootdevice/by-name/vendor"); ||
   abort("E2001: Failed to update vendor image.");
 package_extract_file("boot.img", "/dev/block/bootdevice/by-name/boot");
 show_progress(0.100000, 10);
