@@ -1,15 +1,18 @@
 #!/bin/bash
 
+# Get current cpu cores number and set it as default number of threads for make
+CPUS=$(nproc)
+
 cd $ANDROID_BUILD_TOP
 
-m installclean -j8
+m installclean -j$CPUS
 
 if [ $? != 0 ]; then
     echo "installclean failed"
     exit 1
 fi
 
-m -j8
+m -j$CPUS
 
 if [ $? != 0 ]; then
     echo "make failed"
@@ -44,21 +47,21 @@ for file in "${files[@]}"; do
     sed -i 's/test-keys/release-keys/g' "$file"
 done
 
-m vnod -j8
+m vnod -j$CPUS
 
 if [ $? != 0 ]; then
     echo "vnod failed"
     exit 1
 fi
 
-m snod -j8
+m snod -j$CPUS
 
 if [ $? != 0 ]; then
     echo "snod failed"
     exit 1
 fi
 
-m bootimage -j8
+m bootimage -j$CPUS
 
 if [ $? != 0 ]; then
     echo "make bootimage failed"
