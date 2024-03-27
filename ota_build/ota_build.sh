@@ -117,10 +117,18 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
+# Sign the boot image with the AOSP key
+$ANDROID_BUILD_TOP/out/host/linux-x86/bin/boot_signer /boot boot.img $ANDROID_BUILD_TOP/vendor/rs/config/security/verity.pk8 $ANDROID_BUILD_TOP/vendor/rs/config/security/verity.x509.pem boot.img.signed
+
+if [ $? != 0 ]; then
+    echo "Cannot sign the boot image"
+    exit 1
+fi
+
 # Move the OS images to the ota_custom directory, where the OTA zip contents are
 mv system.raw $OUT/ota_custom/system.img
 mv vendor.raw $OUT/ota_custom/vendor.img
-cp boot.img $OUT/ota_custom/boot.img
+mv boot.img.signed $OUT/ota_custom/boot.img
 
 cd $OUT/ota_custom
 
