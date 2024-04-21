@@ -1,5 +1,5 @@
 pathmap_PROJ := \
-    qcom-audio:hardware/qcom-caf/msm8998/audio \
+    qcom-audio:vendor/qcom/opensource/audio-hal/primary-hal \
     qcom-media:hardware/qcom-caf/msm8998/media \
     qcom-wlan:hardware/qcom/wlan/legacy \
     qcom-display:hardware/qcom-caf/msm8998/display \
