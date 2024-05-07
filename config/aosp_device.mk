@@ -70,6 +70,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     OpenCamera
 
+# SimpleKeyboard
+PRODUCT_PACKAGES += \
+    SimpleKeyboard
+
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     SystemUI
