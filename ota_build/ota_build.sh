@@ -75,6 +75,7 @@ files=(
 # be enough
 for file in "${files[@]}"; do
     sed -i 's/test-keys/release-keys/g' "$file"
+    sed -i 's/dev-keys/release-keys/g' "$file"
 done
 
 # Recreate the vendor image, do not build it again

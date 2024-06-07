@@ -104,3 +104,5 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     persist.wm.enable_remote_keyguard_animation=0
 
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true
+
+PRODUCT_DEFAULT_DEV_CERTIFICATE := vendor/rs/config/security/releasekey
