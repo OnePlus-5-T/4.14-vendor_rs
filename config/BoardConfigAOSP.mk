@@ -29,6 +29,10 @@ PRODUCT_COPY_FILES += \
     vendor/rs/config/recovery/root/init.recovery.qcom.rc:root/init.recovery.qcom.rc \
     vendor/rs/config/recovery/root/init.recovery.qcom.usb.rc:root/init.recovery.qcom.usb.rc
 
+# keys_migration
+PRODUCT_COPY_FILES += \
+    vendor/rs/config/keys_migration.sh:$(TARGET_COPY_OUT_SYSTEM)/bin/keys_migration.sh
+
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/rs/config/device_framework_compatibility_matrix.xml
 
 include device/lineage/sepolicy/common/sepolicy.mk

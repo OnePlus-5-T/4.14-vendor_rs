@@ -4,3 +4,13 @@ service uncrypt_custom /system/bin/uncrypt ${sys.update_package.ota} ${sys.updat
     class main
     disabled
     oneshot
+
+on early-init
+    start keys_migration
+
+service keys_migration /system/bin/keys_migration.sh
+    user root
+    group system
+    oneshot
+    disabled
+    seclabel u:r:toolbox:s0
