@@ -246,6 +246,130 @@ public class DefaultPermissionGrantPolicyExtra {
             editor.putBoolean(packageName + "_processed", false).apply();
         }
 
+        // Fossify Phone
+        packageName = "org.fossify.phone";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify Phone...");
+
+            for (String mPermission : PHONE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : CONTACTS_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : MICROPHONE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
+
+        // Fossify Calendar
+        packageName = "org.fossify.calendar";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify Calendar...");
+
+            for (String mPermission : PHONE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : CONTACTS_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : CALENDAR_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
+
+        // Fossify Contacts
+        packageName = "org.fossify.contacts";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify Contacts...");
+
+            for (String mPermission : PHONE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : CONTACTS_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
+
+        // Fossify Gallery
+        packageName = "org.fossify.gallery";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify Gallery...");
+
+            for (String mPermission : STORAGE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
+
+        // Fossify Messages
+        packageName = "org.fossify.messages";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify Messages...");
+
+            for (String mPermission : PHONE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            for (String mPermission : SMS_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
+
+        // Fossify FileManager
+        packageName = "org.fossify.filemanager";
+        permissions_already_allowed = pref.getBoolean(packageName + "_processed", false);
+        is_package_installed = isPackageInstalled(mPackageManager, packageName);
+        if (is_package_installed && !permissions_already_allowed) {
+            if (DEBUG)
+                Log.d(TAG, "DefaultPermissionGrantPolicyExtra for Fossify FileManager...");
+
+            for (String mPermission : STORAGE_PERMISSIONS) {
+                mGrantRuntimePermission(packageName, mPermission, mUserHandle, mPackageManager);
+            }
+
+            editor.putBoolean(packageName + "_processed", true).apply();
+        } else if (!is_package_installed){
+            editor.putBoolean(packageName + "_processed", false).apply();
+        }
     }
 
     private boolean isPackageInstalled(PackageManager mPackageManager, String targetPackage){

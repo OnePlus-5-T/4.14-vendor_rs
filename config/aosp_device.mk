@@ -74,6 +74,16 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     SimpleKeyboard
 
+# Fossify Apps
+PRODUCT_PACKAGES += \
+    FossifyPhone \
+    FossifyCalendar \
+    FossifyClock \
+    FossifyContacts \
+    FossifyGallery \
+    FossifyMessages \
+    FossifyFileManager
+
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
     SystemUI
