@@ -78,6 +78,25 @@ for file in "${files[@]}"; do
     sed -i 's/dev-keys/release-keys/g' "$file"
 done
 
+# Generates the migration script with the keys used to sign the build
+mac_permissions=$(cat $OUT/system/etc/selinux/plat_mac_permissions.xml)
+signature=$(echo "$mac_permissions" | sed -n 's|.*signature="\([^"]*\)"><seinfo value="platform".*|\1|p')
+
+target_migration_script=$OUT/system/bin/keys_migration.sh
+
+sed -i "s/put_here_new_platform_signature/$signature/" "$target_migration_script"
+
+cd $ANDROID_BUILD_TOP/vendor/rs/config/security/
+
+for x in bluetooth media networkstack platform sdk_sandbox shared; do
+    key=$(echo \"$(openssl x509 -pubkey -noout -in $x.x509.pem | grep -v '-' | tr -d '\n')\")
+    cert=$(echo \"$(openssl x509 -outform der -in $x.x509.pem | xxd -p  | tr -d '\n')\" | tr '[:lower:]' '[:upper:]')
+    sed -i "s|put_here_new_${x}_key|$key|g" "$target_migration_script"
+    sed -i "s|put_here_new_${x}_cert|$cert|g" "$target_migration_script"
+done
+
+cd -
+
 # Recreate the vendor image, do not build it again
 m vnod -j$CPUS
 

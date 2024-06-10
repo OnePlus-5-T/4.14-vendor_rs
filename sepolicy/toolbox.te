@@ -5,6 +5,6 @@ allow toolbox toolbox_exec:file execute_no_trans;
 allow toolbox system_data_file:dir getattr;
 allow toolbox system_data_file:file { read open write getattr create setattr rename };
 
-allow toolbox self:capability chown;
+allow toolbox self:capability { chown fowner };
 
-allow toolbox mac_perms_file:file { open read };
+allow toolbox mac_perms_file:file { open read getattr };
