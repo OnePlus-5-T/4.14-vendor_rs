@@ -88,7 +88,7 @@ sed -i "s/put_here_new_platform_signature/$signature/" "$target_migration_script
 
 cd $ANDROID_BUILD_TOP/vendor/rs/config/security/
 
-for x in bluetooth media networkstack platform sdk_sandbox shared; do
+for x in bluetooth media networkstack platform sdk_sandbox shared nfc; do
     key=$(echo \"$(openssl x509 -pubkey -noout -in $x.x509.pem | grep -v '-' | tr -d '\n')\")
     cert=$(echo \"$(openssl x509 -outform der -in $x.x509.pem | xxd -p  | tr -d '\n')\" | tr '[:lower:]' '[:upper:]')
     sed -i "s|put_here_new_${x}_key|$key|g" "$target_migration_script"
