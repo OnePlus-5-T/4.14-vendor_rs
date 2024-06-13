@@ -81,8 +81,7 @@ PRODUCT_PACKAGES += \
     FossifyClock \
     FossifyContacts \
     FossifyGallery \
-    FossifyMessages \
-    FossifyFileManager
+    FossifyMessages
 
 # Dexpreopt
 PRODUCT_DEXPREOPT_SPEED_APPS += \
