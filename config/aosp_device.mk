@@ -114,3 +114,7 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true
 
 PRODUCT_DEFAULT_DEV_CERTIFICATE := vendor/rs/config/security/releasekey
+
+PRODUCT_CERTIFICATE_OVERRIDES := \
+    Bluetooth:com.android.bluetooth.certificate.override  \
+    BluetoothLegacyMigration:com.android.bluetooth.certificate.override

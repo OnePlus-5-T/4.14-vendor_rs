@@ -1,0 +1,4 @@
+android_app_certificate {
+    name: "com.android.bluetooth.certificate.override",
+    certificate: "bluetooth",
+}
