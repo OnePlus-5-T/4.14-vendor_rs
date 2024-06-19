@@ -23,6 +23,8 @@ static const std::string kAllBacklightPaths[] = {
     "/sys/class/leds/lcd-backlight/brightness",
 };
 
+static const std::string kMaxBacklightPath = "/sys/class/leds/lcd-backlight/max_brightness";
+
 enum led_type {
     RED,
     GREEN,
@@ -64,8 +66,18 @@ ndk::ScopedAStatus Lights::setLightState(int32_t id, const HwLightState& state) 
     LightType type = static_cast<LightType>(id);
     switch (type) {
         case LightType::BACKLIGHT:
-            if (!mBacklightPath.empty())
-                writeToFile(mBacklightPath, colorToBrightness(state.color));
+            if (!mBacklightPath.empty()) {
+                uint32_t newBrightness = colorToBrightness(state.color);
+                uint32_t maxBrightness = 255;
+                readFromFile(kMaxBacklightPath, &maxBrightness);
+                // If max panel brightness exceeds 255, apply proper linear scaling
+                if (newBrightness > 0 && maxBrightness != 255) {
+                    int originalBrightness = newBrightness;
+                    newBrightness = (((maxBrightness - 1) * (newBrightness - 1)) / (254)) + 1;
+                    LOG(DEBUG) << "Scaling backlight brightness from " << originalBrightness << " => " << newBrightness;
+                }
+                writeToFile(mBacklightPath, newBrightness);
+            };
             break;
         case LightType::BATTERY:
         case LightType::NOTIFICATIONS:
