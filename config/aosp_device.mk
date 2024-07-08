@@ -76,7 +76,6 @@ PRODUCT_PACKAGES += \
 
 # Fossify Apps
 PRODUCT_PACKAGES += \
-    FossifyPhone \
     FossifyCalendar \
     FossifyClock \
     FossifyContacts \
@@ -118,5 +117,3 @@ PRODUCT_DEFAULT_DEV_CERTIFICATE := vendor/rs/config/security/releasekey
 PRODUCT_CERTIFICATE_OVERRIDES := \
     Bluetooth:com.android.bluetooth.certificate.override  \
     BluetoothLegacyMigration:com.android.bluetooth.certificate.override
-
-PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS := vendor/rs/overlay/packages/services/Telecomm
