@@ -1,7 +1,3 @@
-# RIL Wrapper
-PRODUCT_PACKAGES += \
-    libril-wrapper
-
 # Extra Apps
 PRODUCT_PACKAGES += \
     SettingsExtra \
